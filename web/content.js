@@ -19,12 +19,16 @@ window.CONTENT = {
      accent     … barva sportovce (zvýraznění na jeho profilu), např. '#ff4fa0'
      sport      … disciplína, { cs, en }
      tagline    … krátký podtitulek na profilu, { cs, en }
-     photo      … hlavní fotka na profilu (na výšku)
+     hero       … scéna v úvodu profilu i v karuselu: { word: velké slovo, background: pozadí, cutout: výřez postavy }
+     photo      … portrét (na profilu v sekci Moje cesta)
      cardPhoto  … fotka na kartu v seznamu (na výšku 3:4)
      illustrative … true = fotka je jen ilustrační (zobrazí se upozornění)
      stats      … velká čísla v hlavičce profilu: [{ value, label: { cs, en } }]
      story      … „Moje cesta“: { title: { cs, en }, paragraphs: { cs: [...], en: [...] }, quote: { cs, en } }
-     achievements … úspěchy: [{ value, title: { cs, en }, detail: { cs, en } }]
+     achievements … úspěchy: [{ value, title: { cs, en }, detail: { cs, en }, icon }]
+                  icon (volitelné) – jinak se vybere sama podle textu:
+                  'medal' (1.–3. místo), 'summit' (prvopřelez), 'flag' (první přelez / první místo v něčem),
+                  'hold' (lezecká obtížnost), 'time' (čas), 'finish' (dokončení / umístění), 'streak' (opakované), 'star'
      goals      … cíle: { title: { cs, en }, intro: { cs, en }, items: [{ label, title: { cs, en }, detail: { cs, en } }] }
      impact     … volitelná sekce navíc (např. charita), stejná struktura jako goals
      partnerOffer … sekce Pro partnery: { text: { cs, en }, items: { cs: [...], en: [...] }, reach: [{ value, label: { cs, en } }] }
@@ -41,6 +45,7 @@ window.CONTENT = {
       accent: '#ff4fa0',
       sport: { cs: 'Skalní bouldering', en: 'Rock bouldering' },
       tagline: { cs: 'Profesionální skalní boulderistka. Tři skalní 8C, z toho dva vlastní prvopřelezy.', en: 'Professional rock boulderer. Three 8C boulders on rock, two of them first ascents.' },
+      hero: { word: 'JANE', background: 'assets/athletes/jana-svecova/hero.webp', cutout: 'assets/athletes/jana-svecova/cutout.webp' },
       photo: 'assets/athletes/jana-svecova/portrait.webp',
       cardPhoto: 'assets/athletes/jana-svecova/card.webp',
       stats: [
@@ -113,6 +118,7 @@ window.CONTENT = {
       accent: '#ffd400',
       sport: { cs: 'Maraton', en: 'Marathon' },
       tagline: { cs: 'Špičkový český maratonec na cestě za národním rekordem.', en: 'Top Czech marathoner on the road to the national record.' },
+      hero: { word: 'VEBR', background: 'assets/athletes/patrik-vebr/hero.webp', cutout: 'assets/athletes/patrik-vebr/cutout.webp' },
       photo: 'assets/athletes/patrik-vebr/portrait.webp',
       cardPhoto: 'assets/athletes/patrik-vebr/card.webp',
       stats: [
@@ -138,7 +144,7 @@ window.CONTENT = {
       achievements: [
         { value: '1.', title: { cs: 'Mistrovství ČR v půlmaratonu', en: 'Czech Half Marathon Championships' }, detail: { cs: '2025', en: '2025' } },
         { value: '1.', title: { cs: 'Mistrovství ČR na 5 km', en: 'Czech 5 km Championships' }, detail: { cs: '2025', en: '2025' } },
-        { value: '3×', title: { cs: 'Nejlepší Čech na Pražském půlmaratonu', en: 'Best Czech at the Prague Half Marathon' }, detail: { cs: '2023, 2024, 2025 · v roce 2025 i první Evropan celkově', en: '2023, 2024, 2025 · in 2025 also first European overall' } },
+        { value: '3×', icon: 'streak', title: { cs: 'Nejlepší Čech na Pražském půlmaratonu', en: 'Best Czech at the Prague Half Marathon' }, detail: { cs: '2023, 2024, 2025 · v roce 2025 i první Evropan celkově', en: '2023, 2024, 2025 · in 2025 also first European overall' } },
         { value: '1.', title: { cs: 'Nejlepší Čech na půlmaratonech RunCzech', en: 'Best Czech at RunCzech half marathons' }, detail: { cs: 'České Budějovice 2024, 2025, 2026 · Karlovy Vary 2023 · Olomouc 2023', en: 'České Budějovice 2024, 2025, 2026 · Karlovy Vary 2023 · Olomouc 2023' } },
         { value: '2.', title: { cs: 'Mistrovství ČR v maratonu', en: 'Czech Marathon Championships' }, detail: { cs: '2024 · 2. místo také v přespolním běhu 2023, 2024 a na 5 000 m 2023', en: '2024 · also 2nd in cross country 2023, 2024 and 5,000 m 2023' } },
         { value: '3.', title: { cs: 'Běchovice–Praha', en: 'Běchovice–Prague' }, detail: { cs: 'Legendární MČR na 10 km, 2026', en: 'Legendary Czech 10 km championships, 2026' } }
@@ -183,6 +189,7 @@ window.CONTENT = {
       accent: '#ff6a1a',
       sport: { cs: 'Ultra trail', en: 'Ultra trail' },
       tagline: { cs: 'Ultra trailový běžec z Beskyd. Výkonnost a vytrvalost na nejtěžších horských tratích.', en: 'Ultra trail runner from the Beskydy mountains. Performance and endurance on the toughest mountain courses.' },
+      hero: { word: 'ULTRA', background: 'assets/athletes/tomas-stverak/hero.webp', cutout: 'assets/athletes/tomas-stverak/cutout.webp' },
       photo: 'assets/athletes/tomas-stverak/portrait.webp',
       cardPhoto: 'assets/athletes/tomas-stverak/card.webp',
       stats: [
@@ -260,17 +267,13 @@ window.CONTENT = {
   ],
 
   /* ---------- ÚVODNÍ KARUSEL (hero) ----------
-     athlete    … slug sportovce ze seznamu výše
-     word       … velké slovo v pozadí
-     title      … nadpis na slidu
-     background … fotka pozadí
-     cutout     … výřez postavy s průhledným pozadím (.webp nebo .png)
-     illustrative … true = AI ilustrace (zobrazí se upozornění), u skutečných fotek false
+     athlete … slug sportovce; slovo, pozadí a výřez se berou z jeho „hero“ (lze tu přepsat: word, background, cutout)
+     title   … nadpis na slidu
   */
   featured: [
-    { athlete: 'jana-svecova', word: 'JANE', title: 'JANA „CLIMBING JANE“ ŠVECOVÁ', background: 'assets/athletes/jana-svecova/hero.webp', cutout: 'assets/athletes/jana-svecova/cutout.webp' },
-    { athlete: 'patrik-vebr', word: 'VEBR', title: 'PATRIK VEBR', background: 'assets/athletes/patrik-vebr/hero.webp', cutout: 'assets/athletes/patrik-vebr/cutout.webp' },
-    { athlete: 'tomas-stverak', word: 'ULTRA', title: 'TOMÁŠ ŠTVERÁK', background: 'assets/athletes/tomas-stverak/hero.webp', cutout: 'assets/athletes/tomas-stverak/cutout.webp' }
+    { athlete: 'jana-svecova', title: 'JANA „CLIMBING JANE“ ŠVECOVÁ' },
+    { athlete: 'patrik-vebr', title: 'PATRIK VEBR' },
+    { athlete: 'tomas-stverak', title: 'TOMÁŠ ŠTVERÁK' }
   ],
 
   /* Sportovci zobrazení na hlavní stránce v sekci „The Renegades“ (slugy, v tomto pořadí). */

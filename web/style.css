@@ -2291,3 +2291,255 @@ footer {
     right: -6%;
   }
 }
+
+/* ---------- Úvod profilu: scéna jako na hlavní stránce ---------- */
+.profile-back {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 4% 0;
+}
+.profile-back .eyebrow {
+  margin: 0;
+}
+.profile-stage {
+  --mx: 0;
+  --my: 0;
+  position: relative;
+  padding: 18px 4% 0;
+}
+.profile-stage .depth-stage {
+  height: clamp(560px, 58vw, 780px);
+  margin-top: 0;
+}
+.profile-stage .scene-word {
+  color: var(--accent);
+  top: 8%;
+}
+.profile-stage .scene-figure {
+  left: 40%;
+  right: 0;
+}
+.profile-stage .scene-lines:before,
+.profile-stage .scene-lines:after,
+.profile-stage .scene-cross {
+  color: var(--accent);
+}
+.profile-stage .cinema-orbit {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.profile-scene-copy {
+  max-width: 46%;
+  bottom: 48px;
+}
+.profile-scene-copy .scene-index {
+  color: var(--accent);
+}
+.profile-scene-copy h1 {
+  color: #fff;
+  font: 800 clamp(54px, 7.4vw, 124px)/.86 var(--heading);
+  text-transform: uppercase;
+  letter-spacing: -.02em;
+  margin: 16px 0 6px;
+  text-shadow: 0 4px 30px #0008;
+}
+.profile-scene-copy .nickname {
+  margin-bottom: 14px;
+}
+.profile-scene-copy p {
+  color: #e6e6dc;
+  font-size: 15px;
+  max-width: 440px;
+  margin: 0 0 24px;
+  text-shadow: 0 2px 14px #000a;
+}
+.profile-scene-copy .socials a {
+  background: #0006;
+  backdrop-filter: blur(6px);
+  border-color: #ffffff40;
+  color: #fff;
+}
+.profile-stats-band {
+  padding: 0 4%;
+}
+.profile-stats-band .profile-stats {
+  margin: 0;
+  border-top: 0;
+}
+.profile-stats-band .profile-stats dt {
+  font-size: clamp(36px, 4.4vw, 64px);
+}
+.story-photo {
+  margin: 40px 0 0;
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  position: relative;
+}
+.story-photo:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px #ffffff1a;
+  border-bottom: 4px solid var(--accent);
+}
+
+/* ---------- Úspěchy: ikona, obrysové číslo v pozadí, hover ---------- */
+.achv {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.achievement-grid li.achv {
+  min-height: 230px;
+  padding: 24px 22px 22px;
+}
+.achv-ghost {
+  position: absolute;
+  right: -8px;
+  bottom: -26px;
+  z-index: -1;
+  font: 800 150px/1 var(--heading);
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px #ffffff14;
+  transition: transform .6s cubic-bezier(.2,.8,.2,1), -webkit-text-stroke-color .4s;
+}
+.achv-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: auto;
+  padding-bottom: 26px;
+}
+.achievement-grid .achv-top strong {
+  margin: 0;
+  padding: 0;
+  font-size: 40px;
+  text-align: right;
+}
+.achv-icon {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  transform: rotate(-6deg);
+  transition: transform .5s cubic-bezier(.3,1.5,.5,1);
+}
+.achv-icon text {
+  fill: var(--accent);
+  stroke: none;
+  font: 800 19px var(--heading);
+}
+.achv.is-gold .achv-icon circle {
+  fill: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.achv:hover .achv-icon {
+  transform: rotate(4deg) scale(1.12);
+}
+.achv:hover .achv-ghost {
+  transform: translate(-12px, -8px);
+  -webkit-text-stroke-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.achv:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.achv:hover:before {
+  transform: scaleX(1);
+}
+/* ikona se „nakreslí“, když karta vjede na obrazovku */
+.achv.reveal .achv-icon :is(path, polyline, polygon, circle) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.achv.reveal.revealed .achv-icon :is(path, polyline, polygon, circle) {
+  animation: icon-draw 1.1s cubic-bezier(.6,0,.2,1) forwards;
+  animation-delay: calc(var(--reveal-delay) + .25s);
+}
+.achv.reveal .achv-icon text {
+  opacity: 0;
+  transition: opacity .4s calc(var(--reveal-delay) + 1s);
+}
+.achv.reveal.revealed .achv-icon text {
+  opacity: 1;
+}
+@keyframes icon-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 900px) {
+  .profile-stage .scene-figure {
+    left: 30%;
+  }
+  .profile-scene-copy {
+    max-width: 62%;
+  }
+}
+@media (max-width: 600px) {
+  .profile-back {
+    padding: 18px 5% 0;
+  }
+  .profile-stage {
+    padding: 14px 5% 0;
+  }
+  .profile-stage .depth-stage {
+    height: 640px;
+  }
+  .profile-stage .scene-word {
+    font-size: 24vw;
+    top: 7%;
+  }
+  .profile-stage .scene-figure {
+    top: 10%;
+    bottom: 34%;
+    left: 8%;
+    right: -4%;
+    -webkit-mask-image: linear-gradient(#000 78%, transparent);
+    mask-image: linear-gradient(#000 78%, transparent);
+  }
+  .profile-scene-copy {
+    max-width: none;
+    left: 6%;
+    right: 6%;
+    bottom: 28px;
+  }
+  .profile-scene-copy h1 {
+    font-size: 54px;
+  }
+  .profile-scene-copy p {
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+  .achievement-grid li.achv {
+    min-height: 0;
+  }
+  .achv-ghost {
+    font-size: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .achv.reveal .achv-icon :is(path, polyline, polygon, circle) {
+    stroke-dashoffset: 0;
+  }
+}
+.profile-scene-copy .scene-index {
+  text-transform: uppercase;
+}
+.achv-icon {
+  stroke-width: 3.4;
+}

@@ -38,24 +38,33 @@ function nav() {
   </header>`;
 }
 
-/* ---------- úvodní karusel ---------- */
-function hero() {
-  const figureAlt = f => f.illustrative ? t('Ilustrační AI postava, nejde o fotografii uvedeného sportovce', 'Illustrative AI figure, not a photograph of the named athlete') : f.title;
-  const slides = C.featured.map((f, k) => `<article class="depth-slide ${k === 0 ? 'is-current' : ''}" data-slide="${k}" aria-roledescription="slide" aria-label="${k + 1} / ${C.featured.length} — ${f.title}" ${k ? 'inert aria-hidden="true"' : 'aria-hidden="false"'}>
-      <div class="cinema-orbit" aria-hidden="true"></div>
-      <div class="scene-background">${img(f.background, '', 'eager')}</div>
+/* ---------- scéna: pozadí, slovo, postava, prach (karusel i profil) ---------- */
+// Slovo, pozadí a výřez se berou z „hero“ sportovce; položka karuselu je může přepsat.
+const sceneOf = f => ({ ...((athletes[bySlug(f.athlete)] || {}).hero || {}), ...f });
+
+function sceneLayers(sc, alt, loading = 'eager') {
+  return `<div class="cinema-orbit" aria-hidden="true"></div>
+      <div class="scene-background">${img(sc.background, '', 'eager')}</div>
       <div class="scene-rays" aria-hidden="true"></div>
       <div class="scene-shade"></div>
       <div class="scene-fog" aria-hidden="true"><i></i><i></i></div>
       <div class="scene-lines" aria-hidden="true"></div>
-      <div class="scene-word" aria-hidden="true">${f.word}</div>
-      <div class="scene-figure">${img(f.cutout, figureAlt(f), k ? 'lazy' : 'eager')}</div>
-      <div class="scene-grit" aria-hidden="true"></div>
+      <div class="scene-word" aria-hidden="true">${sc.word || ''}</div>
+      <div class="scene-figure">${img(sc.cutout, alt, loading)}</div>
+      <div class="scene-grit" aria-hidden="true"></div>`;
+}
+
+/* ---------- úvodní karusel ---------- */
+function hero() {
+  const figureAlt = f => f.illustrative ? t('Ilustrační AI postava, nejde o fotografii uvedeného sportovce', 'Illustrative AI figure, not a photograph of the named athlete') : f.title;
+  const featured = C.featured.map(sceneOf);
+  const slides = featured.map((f, k) => `<article class="depth-slide ${k === 0 ? 'is-current' : ''}" data-slide="${k}" aria-roledescription="slide" aria-label="${k + 1} / ${featured.length} — ${f.title}" ${k ? 'inert aria-hidden="true"' : 'aria-hidden="false"'}>
+      ${sceneLayers(f, figureAlt(f), k ? 'lazy' : 'eager')}
       <div class="scene-copy"><span class="scene-index">${pad(k + 1)} / THE RENEGADES</span><h2>${f.title}</h2>${button(t('Otevřít profil', 'Explore profile'), url(bySlug(f.athlete)))}</div>
       ${f.illustrative ? `<span class="scene-caption">${t('AI ILUSTRACE · SKUTEČNÉ FOTKY DOPLNÍME', 'AI ILLUSTRATION · REAL PHOTOS TO FOLLOW')}</span>` : ''}
       <span class="scene-cross" aria-hidden="true">+</span>
     </article>`).join('');
-  const tabs = C.featured.map((f, k) => `<button class="carousel-tab ${k === 0 ? 'selected' : ''}" data-select="${k}" aria-pressed="${k === 0}"><small>${pad(k + 1)}</small><span>${f.word}</span><i></i></button>`).join('');
+  const tabs = featured.map((f, k) => `<button class="carousel-tab ${k === 0 ? 'selected' : ''}" data-select="${k}" aria-pressed="${k === 0}"><small>${pad(k + 1)}</small><span>${f.word}</span><i></i></button>`).join('');
   return `<section class="showcase cinematic" aria-roledescription="carousel" aria-label="${t('Hlavní sportovci', 'Featured athletes')}" tabindex="0">
     <div class="showcase-head">
       <div><span class="eyebrow">${L(C.home.heroEyebrow)}</span><h1>${L(C.home.heroTitle)}</h1></div>
@@ -136,6 +145,37 @@ function timeline(block, eyebrow, cls = '') {
   </section>`;
 }
 
+/* Ikony úspěchů: tahové SVG v barvě sportovce, při odhalení se „nakreslí“ (pathLength=1). */
+const ICONS = {
+  medal: r => `<polyline pathLength="1" points="20,4 29,24"/><polyline pathLength="1" points="44,4 35,24"/><circle pathLength="1" cx="32" cy="40" r="17"/><text x="32" y="47" text-anchor="middle">${r}</text>`,
+  summit: () => `<polyline pathLength="1" points="4,58 24,24 32,36 40,26 60,58 4,58"/><polyline pathLength="1" points="24,24 24,4 40,9 24,14"/>`,
+  flag: () => `<polyline pathLength="1" points="14,60 14,4"/><path pathLength="1" d="M14 6 C24 0 34 14 50 6 L50 30 C34 38 24 24 14 30"/>`,
+  hold: () => `<path pathLength="1" d="M12 40 C8 24 22 10 37 13 C52 16 58 31 51 43 C44 55 17 55 12 40"/><circle pathLength="1" cx="34" cy="31" r="5"/>`,
+  time: () => `<circle pathLength="1" cx="32" cy="37" r="21"/><polyline pathLength="1" points="26,4 38,4"/><polyline pathLength="1" points="32,4 32,16"/><polyline pathLength="1" points="32,37 32,24 "/><polyline pathLength="1" points="32,37 42,42"/>`,
+  finish: () => `<path pathLength="1" d="M8 60 L8 22 Q32 2 56 22 L56 60"/><polyline pathLength="1" points="8,30 56,30"/><polyline pathLength="1" points="16,46 26,46"/><polyline pathLength="1" points="38,46 48,46"/>`,
+  streak: () => `<polyline pathLength="1" points="8,14 22,32 8,50"/><polyline pathLength="1" points="25,14 39,32 25,50"/><polyline pathLength="1" points="42,14 56,32 42,50"/>`,
+  star: () => `<polygon pathLength="1" points="32,4 40,24 61,24 44,37 50,58 32,45 14,58 20,37 3,24 24,24"/>`
+};
+
+function achievementIcon(x) {
+  const value = String(L(x.value) || '');
+  const text = `${L(x.title) || ''} ${L(x.detail) || ''}`.toLowerCase();
+  const rank = (value.match(/^([1-3])\.$/) || text.match(/\b([1-3])\. (?:místo|place)/) || [])[1];
+  let kind = x.icon;
+  if (!kind) {
+    if (/prvopřelez|first ascent/.test(text)) kind = 'summit';
+    else if (/první|first/.test(text)) kind = 'flag';
+    else if (rank) kind = 'medal';
+    else if (/finisher/.test(text) || /^\d+\.$/.test(value)) kind = 'finish';
+    else if (/\d:\d\d/.test(value)) kind = 'time';
+    else if (/^\d[abc]/i.test(value)) kind = 'hold';
+    else if (/×/.test(value)) kind = 'streak';
+    else kind = 'star';
+  }
+  const svg = (ICONS[kind] || ICONS.star)(rank || '1');
+  return { kind, rank, svg: `<svg class="achv-icon" viewBox="0 0 64 64" aria-hidden="true">${svg}</svg>` };
+}
+
 function profile(i) {
   const a = athletes[i];
   const next = (i + 1) % athletes.length;
@@ -150,13 +190,16 @@ function profile(i) {
     : '';
 
   const story = a.story ? `<section class="section story">
-    <div><span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
+    <div><span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}${a.hero && a.photo ? `<figure class="story-photo">${img(a.photo, a.name)}</figure>` : ''}</div>
     <div>${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}</div>
   </section>` : '';
 
   const achievements = has(a.achievements) ? `<section class="section achievements">
     <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Úspěchy', 'Achievements')}</span><h2>${t('Výsledky,<br>které mluví.', 'Results that<br>speak for themselves.')}</h2></div></div>
-    <ul class="achievement-grid">${a.achievements.map(x => `<li><strong>${L(x.value)}</strong><h3>${L(x.title)}</h3>${x.detail ? `<p>${L(x.detail)}</p>` : ''}</li>`).join('')}</ul>
+    <ul class="achievement-grid">${a.achievements.map(x => {
+      const icon = achievementIcon(x);
+      return `<li class="achv achv-${icon.kind}${icon.rank === '1' ? ' is-gold' : ''}"><span class="achv-ghost" aria-hidden="true">${L(x.value)}</span><div class="achv-top">${icon.svg}<strong>${L(x.value)}</strong></div><h3>${L(x.title)}</h3>${x.detail ? `<p>${L(x.detail)}</p>` : ''}</li>`;
+    }).join('')}</ul>
   </section>` : '';
 
   const goals = a.goals && has(a.goals.items) ? timeline(a.goals, `${num()} / ${t('Cíle', 'Goals')}`) : '';
@@ -179,18 +222,34 @@ function profile(i) {
       : `<button data-action="photo" data-src="${g.src}" data-alt="${L(g.alt) || ''}" aria-label="${t('Zvětšit fotografii', 'Enlarge photograph')}">${img(g.src, L(g.alt) || '')}</button>`).join('')}</div>
   </section>` : '';
 
+  const actions = `<div class="profile-actions">${socials}${button(t('Spolupráce', 'Partnership'), a.partnerOffer ? '#partners' : '#contact')}</div>`;
+  const head = a.hero && a.hero.cutout ? `<div class="profile-back"><a class="eyebrow" href="${rosterUrl()}">← ${t('Všichni renegádi', 'All renegades')}</a><span class="eyebrow">RENEGADE / ${pad(i + 1)} / ${pad(athletes.length)}</span></div>
+  <section class="profile-stage cinematic" aria-label="${a.name}">
+    <div class="depth-stage"><div class="depth-slide is-current">
+      ${sceneLayers(a.hero, a.name)}
+      <div class="scene-copy profile-scene-copy">
+        <span class="scene-index">${a.sport ? L(a.sport) : 'RENEGADE'}</span>
+        <h1>${a.name}</h1>${a.nickname ? `<span class="nickname">„${a.nickname}“</span>` : ''}
+        ${a.tagline ? `<p>${L(a.tagline)}</p>` : ''}
+        ${actions}
+      </div>
+      <span class="scene-cross" aria-hidden="true">+</span>
+    </div></div>
+  </section>
+  ${stats ? `<section class="profile-stats-band">${stats}</section>` : ''}` : '';
+
   return `<div class="athlete-profile"${a.accent ? ` style="--accent:${a.accent}"` : ''}>
-  <section class="profile-hero">
+  ${head || `<section class="profile-hero">
     <div class="profile-copy">
       <a class="eyebrow" href="${rosterUrl()}">← ${t('Všichni renegádi', 'All renegades')}</a>
       <div><small>RENEGADE / ${pad(i + 1)}${a.sport ? ' · ' + L(a.sport) : ''}</small>
         <h1>${a.name}</h1>${a.nickname ? `<span class="nickname">„${a.nickname}“</span>` : ''}
         ${a.tagline ? `<p>${L(a.tagline)}</p>` : ''}</div>
       ${stats}
-      <div class="profile-actions">${socials}${button(t('Spolupráce', 'Partnership'), a.partnerOffer ? '#partners' : '#contact')}</div>
+      ${actions}
     </div>
     <div class="profile-image">${img(a.photo, a.name, 'eager')}${a.illustrative ? `<small>${t('ILUSTRAČNÍ SNÍMEK · PORTRÉT K DOPLNĚNÍ', 'ILLUSTRATIVE IMAGE · PORTRAIT TO BE ADDED')}</small>` : ''}</div>
-  </section>
+  </section>`}
   ${story}${achievements}${goals}${impact}${offer}${gallery}
   ${contact()}
   <section class="section next-athlete"><span class="eyebrow">${t('DALŠÍ RENEGADE', 'NEXT RENEGADE')}</span>${button(athletes[next].name, url(next), true)}</section>
@@ -393,6 +452,42 @@ function initMotion() {
     document.addEventListener('visibilitychange', visibility);
     cleanup.push(() => { clearInterval(timer); document.removeEventListener('visibilitychange', visibility); });
     run();
+  }
+
+  const profileStage = document.querySelector('.profile-stage');
+  if (profileStage) {
+    const move = e => {
+      if (motionOff || e.pointerType === 'touch') return;
+      const r = profileStage.getBoundingClientRect();
+      profileStage.style.setProperty('--mx', ((e.clientX - r.left) / r.width - .5).toFixed(3));
+      profileStage.style.setProperty('--my', ((e.clientY - r.top) / r.height - .5).toFixed(3));
+    };
+    const leave = () => { profileStage.style.setProperty('--mx', '0'); profileStage.style.setProperty('--my', '0'); };
+    profileStage.addEventListener('pointermove', move);
+    profileStage.addEventListener('pointerleave', leave);
+    const dust = !motionOff && typeof initDust === 'function' ? initDust(profileStage) : null;
+    if (dust) cleanup.push(dust.cleanup);
+  }
+
+  // Čísla „naskáčou“ jako na časomíře, když se objeví na obrazovce.
+  if (!motionOff && 'IntersectionObserver' in window) {
+    const timers = [];
+    const scramble = el => {
+      const final = el.textContent;
+      const start = performance.now(), duration = 900 + final.length * 40;
+      const tick = now => {
+        const p = Math.min(1, (now - start) / duration);
+        const locked = Math.floor(p * final.length);
+        el.textContent = [...final].map((ch, k) => k < locked || !/\d/.test(ch) ? ch : Math.floor(Math.random() * 10)).join('');
+        if (p < 1) timers.push(requestAnimationFrame(tick)); else el.textContent = final;
+      };
+      timers.push(requestAnimationFrame(tick));
+    };
+    const counter = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { scramble(entry.target); counter.unobserve(entry.target); }
+    }), { threshold: .6 });
+    document.querySelectorAll('.profile-stats dt, .reach dt, .achv strong').forEach(el => counter.observe(el));
+    cleanup.push(() => { counter.disconnect(); timers.forEach(cancelAnimationFrame); });
   }
 
   if (!motionOff && 'IntersectionObserver' in window) {
