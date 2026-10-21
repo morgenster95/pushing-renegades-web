@@ -189,10 +189,17 @@ function profile(i) {
     ? `<dl class="profile-stats">${a.stats.map(s => `<div><dt>${L(s.value)}</dt><dd>${L(s.label)}</dd></div>`).join('')}</dl>`
     : '';
 
-  const story = a.story ? `<section class="section story">
-    <div><span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}${a.hero && a.photo ? `<figure class="story-photo">${img(a.photo, a.name)}</figure>` : ''}</div>
+  const storyPhoto = a.hero && a.photo; // portrét je v úvodu jen tehdy, když sportovec nemá scénu
+  const storyText = a.story ? `<span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>` : '';
+  const story = a.story ? (storyPhoto
+    ? `<section class="section story story-with-photo">
+    <figure class="story-photo">${img(a.photo, a.name)}</figure>
+    <div class="story-text">${storyText}${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
+  </section>`
+    : `<section class="section story">
+    <div>${storyText}${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
     <div>${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}</div>
-  </section>` : '';
+  </section>`) : '';
 
   const achievements = has(a.achievements) ? `<section class="section achievements">
     <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Úspěchy', 'Achievements')}</span><h2>${t('Výsledky,<br>které mluví.', 'Results that<br>speak for themselves.')}</h2></div></div>

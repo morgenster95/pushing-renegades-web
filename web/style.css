@@ -2543,3 +2543,47 @@ footer {
 .achv-icon {
   stroke-width: 3.4;
 }
+
+/* ---------- Moje cesta: velká fotka vlevo, text vpravo ---------- */
+.story-with-photo {
+  grid-template-columns: 5fr 7fr;
+  gap: 7%;
+  align-items: start;
+}
+.story-with-photo .story-photo {
+  margin: 0;
+  max-width: none;
+  aspect-ratio: 4 / 5;
+  position: sticky;
+  top: 130px;
+}
+.story-text h2 {
+  margin-bottom: 36px;
+}
+.story-text p {
+  max-width: 600px;
+  font-size: 16px;
+}
+.story-text p:first-of-type {
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.55;
+}
+.story-text blockquote {
+  margin-top: 40px;
+  max-width: 600px;
+  font-size: 22px;
+}
+@media (max-width: 600px) {
+  .story-with-photo {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .story-with-photo .story-photo {
+    position: static;
+    aspect-ratio: 1 / 1;
+  }
+  .story-text p:first-of-type {
+    font-size: 17px;
+  }
+}
