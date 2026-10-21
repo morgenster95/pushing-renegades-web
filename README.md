@@ -20,27 +20,34 @@ Podstránky: `?page=athletes` (všichni sportovci), `?athlete=<slug>` (profil), 
 
 ## Jak změnit obsah
 
-### Výměna fotky sportovce
-1. Převeď fotku: `python tools/optimize-images.py moje-fotka.jpg` → vznikne `moje-fotka.webp`.
-2. Ulož ji do `web/assets/athletes/`, pojmenuj podle sportovce, např. `jakub-house-vana-portrait.webp`.
-3. V `web/content.js` u sportovce změň `photo: 'assets/athletes/jakub-house-vana-portrait.webp'`
-   a nastav `illustrative: false` (zmizí upozornění „ilustrační snímek“).
+### Fotky sportovce
+Každý sportovec má složku `web/assets/athletes/<slug>/`:
+
+| Soubor | Kde se zobrazí | Doporučení |
+| --- | --- | --- |
+| `cutout.webp` | výřez postavy v úvodním karuselu | průhledné pozadí, na výšku |
+| `hero.webp` | pozadí slidu v karuselu | na šířku, bez výrazné postavy |
+| `portrait.webp` | hlavní fotka profilu | na výšku |
+| `card.webp` | karta v seznamu sportovců | na výšku 3:4 |
+| `gallery-1…6.webp` | galerie na profilu | 6 fotek, 1. a 4. se zobrazí na výšku |
+
+Výměna: převeď fotku (`python tools/optimize-images.py moje-fotka.jpg`), ulož ji pod stejným názvem
+do složky sportovce a je hotovo. Jiné názvy / počet fotek se nastaví v `web/content.js`.
 
 ### Úvodní karusel
-V `content.js` → `featured`. Každý slide má pozadí (`background`) a výřez postavy s průhledným
-pozadím (`cutout`, PNG → převést na .webp, průhlednost zůstane). Ideální výřez: na výšku, cca 1024×1536 px.
+V `content.js` → `featured`: sportovec, velké slovo v pozadí, nadpis, pozadí a výřez.
 
 ### Nový sportovec
-Přidej blok do `athletes` v `content.js` (zkopíruj existující, změň `slug` a `name`).
-Na hlavní stránce se zobrazí, jen pokud jeho slug přidáš do `homeAthletes`.
+Zkopíruj blok sportovce v `athletes` v `content.js`, změň `slug`, `name`, `accent` (barva) a texty,
+vytvoř složku `web/assets/athletes/<slug>/` s fotkami. Na hlavní stránku ho přidáš do `homeAthletes`.
+Sekce profilu (úspěchy, cíle, pro partnery, galerie…) se zobrazí jen tehdy, když pro ně vyplníš data.
 
-### Medailonek, sítě, partneři, video
-U sportovce v `content.js` doplň `bio`, `socials`, `partners`, `gallery`, `video` (popis polí je na začátku souboru).
-Dokud pole chybí, zobrazuje se ukázkový text.
+### Partneři, video
+U sportovce doplň `partners` (loga) nebo `video` (YouTube/Vimeo embed) – popis polí je na začátku `content.js`.
 
 ### Texty stránek
 Sekce `home`, `roster`, `contact`, `footer` v `content.js`. Každý text má `cs` a `en`.
 
 ## Před ostrým spuštěním
 - Kontaktní formulář zatím nic neodesílá — je potřeba ho napojit (Formspree / Web3Forms / vlastní backend).
-- Fotky a AI postavy jsou ilustrační — nahradit schválenými portréty.
+- Ověřit práva k fotkám od fotografů závodů (RunCzech, Malopolska aj.) a doplnit loga partnerů sportovců.

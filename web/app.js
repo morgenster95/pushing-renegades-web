@@ -84,8 +84,8 @@ function card(i) {
   const alt = a.illustrative
     ? (a.cardCutout ? t('Ilustrační AI portrét, nejde o skutečnou podobu sportovce', 'Illustrative AI portrait, not the actual athlete') : t('Ilustrační fotografie přírody a outdooru — nejde o portrét sportovce', 'Illustrative outdoor photography — not an athlete portrait'))
     : a.name;
-  return `<a class="athlete" href="${url(i)}">
-    <div class="picture">${img(src, alt, 'lazy', a.cardCutout ? 'roster-portrait' : '')}<span class="number">RENEGADE / ${pad(i + 1)}</span><span class="arrow" aria-hidden="true">↗</span></div>
+  return `<a class="athlete" href="${url(i)}"${a.accent ? ` style="--accent:${a.accent}"` : ''}>
+    <div class="picture">${img(src, alt, 'lazy', a.cardCutout ? 'roster-portrait' : '')}<span class="number">RENEGADE / ${pad(i + 1)}${a.sport ? ' · ' + L(a.sport) : ''}</span><span class="arrow" aria-hidden="true">↗</span></div>
     <div class="caption"><h3>${a.name}</h3><small>${t('Poznej příběh', 'Explore the story')} ↗</small></div>
   </a>`;
 }
@@ -125,56 +125,76 @@ function rosterPage() {
 }
 
 /* ---------- profil sportovce ---------- */
+// Sekce profilu se vykreslí jen tehdy, když pro ni má sportovec v content.js data.
+const has = list => Array.isArray(list) && list.length > 0;
+
+function timeline(block, eyebrow, cls = '') {
+  if (!block || !has(block.items)) return '';
+  return `<section class="section profile-timeline ${cls}">
+    <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${L(block.title)}</h2></div>${block.intro ? `<p>${L(block.intro)}</p>` : ''}</div>
+    <ol class="timeline">${block.items.map(item => `<li><span class="timeline-label">${L(item.label)}</span><div><h3>${L(item.title)}</h3><p>${L(item.detail)}</p></div></li>`).join('')}</ol>
+  </section>`;
+}
+
 function profile(i) {
   const a = athletes[i];
   const next = (i + 1) % athletes.length;
-  const bio = L(a.bio);
-  const socials = a.socials && a.socials.length
-    ? a.socials.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join('')
-    : ['Instagram', 'YouTube', 'Strava'].map(s => `<button data-action="social" data-label="${s}">${s} ↗</button>`).join('');
+  let n = 0;
+  const num = () => pad(++n);
 
-  const partners = a.partners && a.partners.length
-    ? a.partners.map(p => {
-        const inner = `<small>${L(p.level) || ''}</small><strong>${p.logo ? img(p.logo, p.name, 'lazy', 'partner-logo') : p.name}${p.url ? ' ↗' : ''}</strong><small>${L(p.note) || ''}</small>`;
-        return p.url ? `<a class="partner" href="${p.url}" target="_blank" rel="noopener">${inner}</a>` : `<div class="partner">${inner}</div>`;
-      }).join('')
-    : `<div class="partner"><small>${t('Hlavní partner', 'Main partner')}</small><strong>${t('LOGO PARTNERA', 'PARTNER LOGO')} ↗</strong><small>${t('Společný příběh spolupráce', 'The story of the partnership')}</small></div><div class="partner"><small>Partner</small><strong>${t('LOGO ZNAČKY', 'BRAND LOGO')}</strong><small>${t('Podpora na cestě', 'Support along the way')}</small></div><div class="partner"><small>${t('Technický partner', 'Technical partner')}</small><strong>${t('LOGO ZNAČKY', 'BRAND LOGO')}</strong><small>${t('Vybavení do terénu', 'Equipment for the outdoors')}</small></div>`;
+  const socials = has(a.socials)
+    ? `<div class="socials">${a.socials.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join('')}</div>`
+    : '';
+  const stats = has(a.stats)
+    ? `<dl class="profile-stats">${a.stats.map(s => `<div><dt>${L(s.value)}</dt><dd>${L(s.label)}</dd></div>`).join('')}</dl>`
+    : '';
 
-  const gallery = a.gallery && a.gallery.length ? a.gallery : [
-    { src: 'assets/climb.webp', alt: { cs: 'Ilustrační fotografie lezení', en: 'Illustrative climbing photograph' } },
-    { src: 'assets/ridge.webp', alt: { cs: 'Ilustrační fotografie hor', en: 'Illustrative mountain photograph' } }
-  ];
-  const videoThumb = gallery[0].src === 'assets/climb.webp' ? 'assets/trail.webp' : gallery[0].src;
+  const story = a.story ? `<section class="section story">
+    <div><span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
+    <div>${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}</div>
+  </section>` : '';
 
-  return `<section class="profile-hero">
+  const achievements = has(a.achievements) ? `<section class="section achievements">
+    <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Úspěchy', 'Achievements')}</span><h2>${t('Výsledky,<br>které mluví.', 'Results that<br>speak for themselves.')}</h2></div></div>
+    <ul class="achievement-grid">${a.achievements.map(x => `<li><strong>${L(x.value)}</strong><h3>${L(x.title)}</h3>${x.detail ? `<p>${L(x.detail)}</p>` : ''}</li>`).join('')}</ul>
+  </section>` : '';
+
+  const goals = a.goals && has(a.goals.items) ? timeline(a.goals, `${num()} / ${t('Cíle', 'Goals')}`) : '';
+  const impact = a.impact && has(a.impact.items) ? timeline(a.impact, `${num()} / ${t('Mimo závody', 'Beyond racing')}`, 'impact') : '';
+
+  const offer = a.partnerOffer ? `<section id="partners" class="section partner-offer">
+    <div><span class="eyebrow">${num()} / ${t('Pro partnery', 'For partners')}</span><h2>${t('Pojďme do toho<br>spolu.', 'Let’s do this<br>together.')}</h2>
+      ${has(a.partnerOffer.reach) ? `<dl class="reach">${a.partnerOffer.reach.map(r => `<div><dt>${L(r.value)}</dt><dd>${L(r.label)}</dd></div>`).join('')}</dl>` : ''}</div>
+    <div><p class="offer-text">${L(a.partnerOffer.text)}</p>
+      <ul class="offer-list">${(L(a.partnerOffer.items) || []).map(x => `<li>${x}</li>`).join('')}</ul>
+      ${has(a.partners) ? `<div class="partner-logos">${a.partners.map(p => { const inner = p.logo ? img(p.logo, p.name, 'lazy', 'partner-logo') : `<strong>${p.name}</strong>`; return p.url ? `<a href="${p.url}" target="_blank" rel="noopener">${inner}</a>` : `<span>${inner}</span>`; }).join('')}</div>` : ''}
+      ${button(t('Poptat spolupráci', 'Request a partnership'), '#contact')}</div>
+  </section>` : '';
+
+  const tiles = (a.video ? [{ video: true }] : []).concat(a.gallery || []);
+  const gallery = has(tiles) ? `<section class="section">
+    <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Z terénu', 'From the field')}</span><h2>${t('Blíž skutečnosti.', 'Closer to the real thing.')}</h2></div></div>
+    <div class="gallery">${tiles.map(g => g.video
+      ? `<button data-action="video" aria-label="${t('Přehrát video', 'Play video')}">${img(a.gallery && a.gallery[0] ? a.gallery[0].src : a.photo, '')}<span class="play">▷</span></button>`
+      : `<button data-action="photo" data-src="${g.src}" data-alt="${L(g.alt) || ''}" aria-label="${t('Zvětšit fotografii', 'Enlarge photograph')}">${img(g.src, L(g.alt) || '')}</button>`).join('')}</div>
+  </section>` : '';
+
+  return `<div class="athlete-profile"${a.accent ? ` style="--accent:${a.accent}"` : ''}>
+  <section class="profile-hero">
     <div class="profile-copy">
       <a class="eyebrow" href="${rosterUrl()}">← ${t('Všichni renegádi', 'All renegades')}</a>
-      <div><small>RENEGADE / ${pad(i + 1)}${a.sport ? ' · ' + L(a.sport) : ''}</small><h1>${a.name}</h1><p>${L(a.tagline) || t('Vlastní cesta. Každodenní práce. Příběh, který stojí za pozornost.', 'An individual path. Daily dedication. A story worth telling.')}</p></div>
-      <div class="socials">${socials}</div>
+      <div><small>RENEGADE / ${pad(i + 1)}${a.sport ? ' · ' + L(a.sport) : ''}</small>
+        <h1>${a.name}</h1>${a.nickname ? `<span class="nickname">„${a.nickname}“</span>` : ''}
+        ${a.tagline ? `<p>${L(a.tagline)}</p>` : ''}</div>
+      ${stats}
+      <div class="profile-actions">${socials}${button(t('Spolupráce', 'Partnership'), a.partnerOffer ? '#partners' : '#contact')}</div>
     </div>
-    <div class="profile-image">${img(a.photo, a.illustrative ? t('Ilustrační outdoorová fotografie, nikoli portrét uvedeného sportovce', 'Illustrative outdoor photography, not a portrait of the named athlete') : a.name, 'eager')}${a.illustrative ? `<small>${t('ILUSTRAČNÍ SNÍMEK · PORTRÉT K DOPLNĚNÍ', 'ILLUSTRATIVE IMAGE · PORTRAIT TO BE ADDED')}</small>` : ''}</div>
+    <div class="profile-image">${img(a.photo, a.name, 'eager')}${a.illustrative ? `<small>${t('ILUSTRAČNÍ SNÍMEK · PORTRÉT K DOPLNĚNÍ', 'ILLUSTRATIVE IMAGE · PORTRAIT TO BE ADDED')}</small>` : ''}</div>
   </section>
-  <section class="section story">
-    <div><span class="eyebrow">01 / ${t('Příběh', 'The story')}</span><h2>${t('Za jménem<br>je cesta.', 'Behind the name<br>is a journey.')}</h2></div>
-    <div>${bio
-      ? `<h3>${bio.title || ''}</h3>${(bio.paragraphs || []).map(p => `<p>${p}</p>`).join('')}`
-      : `<h3>${t('Tady začíná osobní příběh.', 'This is where the personal story begins.')}</h3><p>${t('V této části dostane prostor vlastní hlas sportovce: jak se ke sportu dostal, co ho žene dál a k jakému cíli právě směřuje. Doplníme autentický medailonek, sportovní disciplínu a ověřené milníky.', 'This section will feature the athlete’s own voice: how they found their sport, what keeps them going and the goal they are working towards. An authentic biography, discipline and verified milestones will be added.')}</p><p class="note">${t('Ukázka jednotné šablony. Medailonek doplníme.', 'Shared template preview. The biography will be added.')}</p>`}
-      ${button(t('Poznej partnery', 'Meet the partners'), '#partners', true)}</div>
-  </section>
-  <section id="partners" class="section partners">
-    <div class="section-head"><div><span class="eyebrow">02 / ${t('Lidé a značky, kteří stojí za mnou', 'The people and brands behind me')}</span><h2>${t('Nikdo nejde<br>celou cestu sám.', 'Nobody goes<br>all the way alone.')}</h2></div><p>${t('Partneři, kteří jsou součástí cesty.', 'The partners who are part of the journey.')}</p></div>
-    <div class="partnergrid">${partners}</div>
-    ${a.partners && a.partners.length ? '' : `<p class="note">${t('Ukázková místa pro loga — partneři zatím nebyli doplněni.', 'Placeholder areas for logos — partners have not been added yet.')}</p>`}
-  </section>
-  <section class="section">
-    <div class="section-head"><div><span class="eyebrow">03 / ${t('Z terénu', 'From the field')}</span><h2>${t('Blíž skutečnosti.', 'Closer to the real thing.')}</h2></div><p>${t('Fotografie, film a momenty mezi startem a cílem.', 'Photography, film and the moments between start and finish.')}</p></div>
-    <div class="gallery">
-      <button data-action="video" aria-label="${t('Přehrát video', 'Play video')}">${img(videoThumb, t('Náhled videa', 'Video thumbnail'))}<span class="play">▷</span><label>${a.video ? 'VIDEO' : t('VIDEO / Připravujeme', 'VIDEO / Coming soon')}</label></button>
-      ${gallery.map(g => `<button data-action="photo" data-src="${g.src}" data-alt="${L(g.alt) || ''}" aria-label="${t('Zvětšit fotografii', 'Enlarge photograph')}">${img(g.src, L(g.alt) || '')}</button>`).join('')}
-    </div>
-  </section>
+  ${story}${achievements}${goals}${impact}${offer}${gallery}
   ${contact()}
-  <section class="section next-athlete"><span class="eyebrow">${t('DALŠÍ RENEGADE', 'NEXT RENEGADE')}</span>${button(athletes[next].name, url(next), true)}</section>`;
+  <section class="section next-athlete"><span class="eyebrow">${t('DALŠÍ RENEGADE', 'NEXT RENEGADE')}</span>${button(athletes[next].name, url(next), true)}</section>
+  </div>`;
 }
 
 /* ---------- kontakt ---------- */
@@ -262,8 +282,7 @@ document.addEventListener('click', e => {
     if (current && current.video) show(`<div class="video-frame"><iframe src="${current.video}" title="Video — ${current.name}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`);
     else show(`<small>VIDEO</small><h2 style="margin-top:25px">${t('Tady poběží<br>skutečný příběh.', 'The real story<br>will play here.')}</h2><p>${t('Video připravujeme.', 'The video is coming soon.')}</p>`);
   }
-  if (action === 'social') show(`<h2>${a.dataset.label}</h2><p>${t('Odkaz na profil sportovce doplníme.', 'The link to the athlete’s profile will be added.')}</p>`);
-  if (action === 'credits') show(`<h2>${t('Fotografie', 'Photography')}</h2><p>${t('Web používá ilustrační fotografie z Unsplash a anonymní postavy vytvořené pomocí AI. Nejde o podobizny uvedených sportovců.', 'This site uses illustrative Unsplash photography and anonymous AI-generated figures, not portraits of the named athletes.')}</p><p><a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash ↗</a></p>`);
+  if (action === 'credits') show(`<h2>${t('Fotografie', 'Photography')}</h2><p>${t('Fotografie sportovců pocházejí z jejich archivů a od fotografů jednotlivých závodů. Krajinné fotografie: Unsplash.', 'Athlete photographs come from the athletes’ own archives and race photographers. Landscape photography: Unsplash.')}</p><p><a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash ↗</a></p>`);
 });
 
 /* ---------- vyhledávání a formulář ---------- */
@@ -380,7 +399,7 @@ function initMotion() {
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('revealed'); observer.unobserve(entry.target); }
     }), { threshold: .1 });
-    document.querySelectorAll('.section-head,.service,.manifesto>div,.athlete,.partner,.contact-shell>div').forEach((el, i) => {
+    document.querySelectorAll('.section-head,.service,.manifesto>div,.athlete,.achievement-grid li,.timeline li,.contact-shell>div').forEach((el, i) => {
       el.classList.add('reveal');
       el.style.setProperty('--reveal-delay', (i % 3) * 70 + 'ms');
       observer.observe(el);

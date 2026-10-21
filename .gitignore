@@ -3,3 +3,6 @@ Thumbs.db
 node_modules/
 .firebase/
 *.log
+
+# Zdrojové podklady (PDF s kontakty, originální fotky) – necommitovat
+podklady-sport/
