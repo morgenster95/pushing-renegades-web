@@ -44,7 +44,9 @@ function hero() {
   const slides = C.featured.map((f, k) => `<article class="depth-slide ${k === 0 ? 'is-current' : ''}" data-slide="${k}" aria-roledescription="slide" aria-label="${k + 1} / ${C.featured.length} — ${f.title}" ${k ? 'inert aria-hidden="true"' : 'aria-hidden="false"'}>
       <div class="cinema-orbit" aria-hidden="true"></div>
       <div class="scene-background">${img(f.background, '', 'eager')}</div>
+      <div class="scene-rays" aria-hidden="true"></div>
       <div class="scene-shade"></div>
+      <div class="scene-fog" aria-hidden="true"><i></i><i></i></div>
       <div class="scene-lines" aria-hidden="true"></div>
       <div class="scene-word" aria-hidden="true">${f.word}</div>
       <div class="scene-figure">${img(f.cutout, figureAlt(f), k ? 'lazy' : 'eager')}</div>
@@ -307,6 +309,8 @@ function initMotion() {
     const tabs = [...stage.querySelectorAll('.carousel-tab')];
     const pause = stage.querySelector('.pause-carousel');
     let current = 0, paused = motionOff, hover = false, focused = false, timer = null, startX = 0, startY = 0;
+    const dust = !motionOff && typeof initDust === 'function' ? initDust(stage) : null;
+    if (dust) cleanup.push(dust.cleanup);
 
     const labelPause = () => {
       pause.textContent = paused ? '▶' : 'Ⅱ';
@@ -331,6 +335,7 @@ function initMotion() {
         tab.classList.toggle('selected', i === current);
         tab.setAttribute('aria-pressed', i === current);
       });
+      if (dust) dust.burst();
       run();
     };
 
