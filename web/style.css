@@ -2251,18 +2251,6 @@ footer {
   }
 }
 
-/* ---------- Vrstvení ve 3D: text a přední prach musí být před postavou (ta má translateZ až 120px) ---------- */
-.cinematic .scene-copy {
-  transform: translateZ(140px) scale(.907);
-  transform-origin: 0 100%;
-}
-.scene-dust-front {
-  transform: translateZ(130px) scale(.913);
-}
-.cinematic .scene-caption {
-  transform: translateZ(140px) scale(.907);
-  transform-origin: 100% 100%;
-}
 @media (max-width: 600px) {
   .cinematic .scene-figure {
     left: 22%;
@@ -2281,4 +2269,25 @@ footer {
 .picture .number {
   text-transform: uppercase;
   text-shadow: 0 1px 8px #0009;
+}
+
+/* ---------- Postava zůstává uvnitř fotky: nic nepřesahuje rám ----------
+   Slide je plochý (bez 3D), pořadí vrstev řídí z-index: pozadí < prach < postava < text. */
+.depth-stage {
+  overflow: hidden;
+}
+.depth-slide {
+  transform-style: flat;
+}
+.cinematic .scene-figure {
+  top: 5%;
+  bottom: 0;
+}
+@media (max-width: 600px) {
+  .cinematic .scene-figure {
+    top: 8%;
+    bottom: 0;
+    left: 18%;
+    right: -6%;
+  }
 }
