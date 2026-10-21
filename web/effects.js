@@ -166,3 +166,80 @@ function initDust(stage) {
     }
   };
 }
+
+/*
+  Cílová páska přes nadpis: najetí myší (nebo doscrollování na dotykových zařízeních)
+  pásky napne a roztrhne, nadpis pod nimi se rozsvítí. Po odscrollování se pásky znovu natáhnou.
+*/
+function initFinishLine(el) {
+  const label = 'FINISH LINE ↗ PUSHING RENEGADES ↗ ';
+  const tapes = [
+    { top: 8, rot: -4 },
+    { top: 42, rot: 2.5 },
+    { top: 74, rot: -1.5 }
+  ];
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const layer = document.createElement('div');
+  layer.className = 'finish-tapes';
+  layer.setAttribute('aria-hidden', 'true');
+
+  function build() {
+    layer.innerHTML = tapes.map((t, k) => {
+      const tear = rand(38, 62);
+      const xs = Array.from({ length: 9 }, (_, i) => tear + (i % 2 ? rand(.6, 1.6) : -rand(.6, 1.6)));
+      const edge = xs.map((x, i) => `${x.toFixed(2)}% ${i * 12.5}%`);
+      // levá půlka mírně přesahuje, aby před roztržením nebyl vidět šev
+      const left = `polygon(0 0, ${xs.map((x, i) => `${(x + .4).toFixed(2)}% ${i * 12.5}%`).join(', ')}, 0 100%)`;
+      const right = `polygon(${edge.join(', ')}, 100% 100%, 100% 0)`;
+      const text = `<i>${label.repeat(8)}</i>`;
+      const fibers = Array.from({ length: 7 }, () => `<b style="--dx:${rand(-40, 40).toFixed(0)}px;--dy:${rand(-35, 45).toFixed(0)}px;--r:${rand(-90, 90).toFixed(0)}deg"></b>`).join('');
+      return `<div class="finish-tape" style="--top:${t.top}%;--rot:${t.rot}deg;--delay:${k * 110}ms;--fall-l:${rand(14, 26).toFixed(1)}deg;--fall-r:${-rand(14, 26).toFixed(1)}deg">
+        <span class="tape-half left" style="clip-path:${left}">${text}</span>
+        <span class="tape-half right" style="clip-path:${right}">${text}</span>
+        <span class="tape-fibers" style="left:${tear.toFixed(2)}%">${fibers}</span>
+      </div>`;
+    }).join('');
+  }
+
+  let timer = 0, autoTimer = 0;
+  const touch = window.matchMedia('(hover: none)').matches;
+
+  function tear() {
+    if (!el.classList.contains('armed') || el.classList.contains('tension')) return;
+    clearTimeout(autoTimer);
+    el.classList.add('tension');
+    timer = setTimeout(() => { el.classList.remove('armed', 'tension'); el.classList.add('torn'); }, 160);
+  }
+  function arm() {
+    clearTimeout(timer);
+    el.classList.remove('torn', 'tension');
+    build();
+    el.classList.add('armed');
+  }
+
+  const onEnter = e => { if (e.pointerType === 'mouse') tear(); };
+  const io = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && entry.intersectionRatio >= .6) {
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(tear, touch ? 450 : 3000);
+    } else if (!entry.isIntersecting) {
+      clearTimeout(autoTimer);
+      if (el.classList.contains('torn')) arm();
+    }
+  }, { threshold: [0, .6] });
+
+  el.appendChild(layer);
+  arm();
+  el.addEventListener('pointerenter', onEnter);
+  el.addEventListener('click', tear);
+  io.observe(el);
+
+  return () => {
+    clearTimeout(timer); clearTimeout(autoTimer);
+    io.disconnect();
+    el.removeEventListener('pointerenter', onEnter);
+    el.removeEventListener('click', tear);
+    el.classList.remove('armed', 'tension', 'torn');
+    layer.remove();
+  };
+}

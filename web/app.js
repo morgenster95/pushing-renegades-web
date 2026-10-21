@@ -97,7 +97,7 @@ function home() {
   return `${hero()}
   <section id="approach" class="section manifesto">
     <div><span class="eyebrow">01 / ${L(h.stance.eyebrow)}</span><div class="pr-stamp">PR<span>↗</span></div><p class="pr-lines">PUBLIC RELATIONS<br>PERSONAL RECORDS<br>PUSHING RENEGADES</p></div>
-    <div><h2>${L(h.stance.title)}</h2>${L(h.stance.paragraphs).map(p => `<p>${p}</p>`).join('')}</div>
+    <div><div class="finish-line"><h2 class="finish-title">${L(h.stance.title).split('<br>').map((line, i) => `<span style="--i:${i}">${line}</span>`).join('')}</h2></div>${L(h.stance.paragraphs).map(p => `<p>${p}</p>`).join('')}</div>
   </section>
   <section id="athletes" class="section">
     <div class="section-head"><div><span class="eyebrow">02 / THE RENEGADES</span><h2>${L(h.renegades.title)}</h2></div><p>${L(h.renegades.text)}</p></div>
@@ -386,6 +386,9 @@ function initMotion() {
       observer.observe(el);
     });
     cleanup.push(() => observer.disconnect());
+  }
+  if (!motionOff && typeof initFinishLine === 'function') {
+    document.querySelectorAll('.finish-line').forEach(el => cleanup.push(initFinishLine(el)));
   }
   motionCleanup = () => cleanup.forEach(fn => fn());
 }

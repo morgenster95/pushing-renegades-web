@@ -1949,3 +1949,108 @@ a.partner:hover {
     animation: none;
   }
 }
+
+/* ---------- Cílová páska přes nadpis „Výkon si zaslouží…“ ---------- */
+.finish-line {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  cursor: default;
+}
+.finish-title span {
+  display: block;
+  transition: opacity .7s calc(var(--i) * 120ms + 250ms), transform .8s cubic-bezier(.2,.8,.2,1) calc(var(--i) * 120ms + 250ms), filter .7s calc(var(--i) * 120ms + 250ms);
+}
+.finish-line.armed .finish-title span,
+.finish-line.tension .finish-title span {
+  opacity: .14;
+  transform: translateY(10px);
+  filter: blur(2px);
+  transition: none;
+}
+.finish-line.armed {
+  cursor: pointer;
+}
+.finish-tapes {
+  position: absolute;
+  inset: 0 -6%;
+  pointer-events: none;
+}
+.finish-tape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--top);
+  height: clamp(30px, 3.6vw, 50px);
+  transform: rotate(var(--rot));
+  filter: drop-shadow(0 8px 14px #0008);
+}
+.tape-half {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--accent) repeating-linear-gradient(115deg, transparent 0 22px, #0000000d 22px 24px);
+  color: #141714;
+  font: 800 clamp(15px, 1.7vw, 23px) var(--heading);
+  letter-spacing: .03em;
+  opacity: 0;
+}
+.tape-half i {
+  font-style: normal;
+  padding-left: 14px;
+}
+.tape-half.left {
+  transform-origin: 0 50%;
+}
+.tape-half.right {
+  transform-origin: 100% 50%;
+}
+.finish-line.armed .tape-half,
+.finish-line.tension .tape-half {
+  opacity: 1;
+}
+.finish-line.armed .finish-tape {
+  animation: tape-stretch-in .7s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: var(--delay);
+}
+.finish-line.tension .finish-tape {
+  animation: tape-tension .16s ease-in both;
+  animation-delay: var(--delay);
+}
+.finish-line.torn .tape-half {
+  transition: transform 1.1s cubic-bezier(.3,1.4,.4,1) var(--delay), opacity .45s ease-in calc(var(--delay) + .75s);
+}
+.finish-line.torn .tape-half.left {
+  transform: translateX(-6%) rotate(var(--fall-l)) translateY(14px);
+}
+.finish-line.torn .tape-half.right {
+  transform: translateX(6%) rotate(var(--fall-r)) translateY(14px);
+}
+.tape-fibers {
+  position: absolute;
+  top: 50%;
+}
+.tape-fibers b {
+  position: absolute;
+  width: 9px;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+}
+.finish-line.torn .tape-fibers b {
+  animation: fiber-fly .7s ease-out var(--delay) both;
+}
+@keyframes tape-stretch-in {
+  from { clip-path: inset(0 100% 0 0); }
+}
+@keyframes tape-tension {
+  50% { transform: rotate(var(--rot)) scaleY(.82) translateY(-2px); }
+  to { transform: rotate(var(--rot)) scaleY(.88); }
+}
+@keyframes fiber-fly {
+  from { opacity: 1; transform: translate(0, 0) rotate(0); }
+  to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); }
+}
