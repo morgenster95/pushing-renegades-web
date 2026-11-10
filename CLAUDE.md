@@ -27,12 +27,12 @@ Podstránky přes URL: `?page=athletes`, `?page=media`, `?athlete=<slug>`, `?pro
 
 - **Vizuál:** jen směr *RAW / Break the Frame* (tmavá `#171817` + acid žlutá `#edff38`, Barlow Condensed / DM Sans / IBM Plex Mono). Ostatní koncepty, palety a přepínače byly odstraněny – nevracet.
 - **Název:** Pushing Renegades. „We Push Renegades“ jen občas jako claim. Je to sportovní PR agentura (s.r.o. ve vzniku).
-- **Sportovci:** jen Jana Švecová, Patrik Vebr, Tomáš Štverák. Další (Jakub Váňa, Tomáš Petreček, Bára Závodník, Tereza Širůčková…) přidávat až s dodanými podklady. Agostino, Procházka, Ondra nejsou potvrzení – nezveřejňovat.
+- **Sportovci:** Jana Švecová, Patrik Vebr, Tomáš Štverák, Tereza Širůčková. Další (Jakub Váňa, Tomáš Petreček, Bára Závodník…) přidávat až s dodanými podklady. Agostino, Procházka, Ondra nejsou potvrzení – nezveřejňovat.
 - **Projekty** (K2, film Rekord, Tracking s Pavlem Paloncým) mají vlastní podstránky na šabloně profilu. Nové projekty jen přidat do `projects` v content.js.
 - **Partneři** jsou zvlášť pro agenturu (HP), pro každý projekt a pro každého sportovce – každý má jiná loga. Pravidla pro dodávání log jsou v README (SVG, průhledné, bez podkladu; web je zobrazuje jednobarevně bíle a dorovnává velikost podle poměru stran). Mixit, Alza, HUDY, Leki, Česká spořitelna, Shoptet jsou zatím jen záměry – nezobrazovat jejich loga bez podpisu.
 - **Mockupy:** neověřené texty a loga mají `draft: true` → štítek MOCKUP (`brand.showDrafts`). Nevymýšlet fakta o skutečných lidech; mockup psát obecně.
 - **Design je hotový** – nové sekce skládat z existujících prvků (scéna, karty, časová osa, žlutý blok Pro partnery), nepřestavovat.
-- **Barva sportovce** (`accent` v content.js) se použije na jeho profilu a kartě: Jana `#ff4fa0`, Patrik `#ffd400`, Tomáš `#ff6a1a`. Karusel na hlavní stránce zůstává žlutý.
+- **Barva sportovce** (`accent` v content.js) se použije na jeho profilu a kartě: Jana `#ff4fa0`, Patrik `#ffd400`, Tomáš `#ff6a1a`, Tereza `#4fc8ff`. Karusel na hlavní stránce zůstává žlutý.
 - **Kontakty:** na web nedávat osobní telefony ani e-maily sportovců/manažerů. Poptávky jdou přes formulář agentury (předvyplní jméno sportovce).
 - **Profil sportovce** = scéna jako na HP (výřez postavy + velké slovo v barvě sportovce + prach), pod ní čísla (časomíra), Moje cesta (velká fotka vlevo, text vpravo), Úspěchy (karty s ikonami), Cíle, případně Mimo závody (charita), Pro partnery (zkrácená obchodní sekce), galerie 6 fotek, kontakt. Sekce bez dat se nezobrazí.
 - **Postavy ve scéně nesmí přesahovat rám fotky** (uživatel výslovně nechce). `.depth-stage { overflow: hidden }`, slidy jsou ploché (`transform-style: flat`), pořadí vrstev řídí z-index. Nevracet 3D `translateZ` – na mobilu pak postava překrývala text a na desktopu se ořezávala jména.
@@ -52,7 +52,8 @@ Podstránky přes URL: `?page=athletes`, `?page=media`, `?athlete=<slug>`, `?pro
 - Ověřit práva k fotkám od fotografů závodů (RunCzech, Malopolska, tiskové zprávy).
 - Doplnit odkazy na Stravu, ověřit Instagram Patrika (`patrik.vebr` – přečteno ze screenshotu v prezentaci).
 - Loga partnerů sportovců (Jana má v prezentaci jen jako obrázek) a případně YouTube video Jany.
-- Výřez Tomáše je malý (362×1012 px) – při dodání většího vyměnit.
+- Výřezy Tomáše (362×1012 px) a Terezy (414×1087 px, z prezentace) jsou malé – při dodání většího vyměnit.
+- Tereza: Instagram 3 029 sledujících přečteno ze screenshotu v prezentaci – ověřit. Manažer Jan Verner (kontakty z prezentace na web nedávat).
 - Favicon a OG náhled pro sdílení.
 - Logo agentury (`brand.logo`), úvodní spot (`film.video` + `videoVertical`, premiéra leden 2027), teaser filmu Rekord.
 - Texty od Honzy Vernera místo mockupů (mise/vize/filozofie, projekty, FAQ, tisková zpráva); prezentace K2 od Aničky.

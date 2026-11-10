@@ -284,6 +284,86 @@ window.CONTENT = {
         { src: 'assets/athletes/tomas-stverak/gallery-5.webp', alt: { cs: 'Cíl Lysohorského Ultra Trailu', en: 'Finish of the Lysohorský Ultra Trail' } },
         { src: 'assets/athletes/tomas-stverak/gallery-6.webp', alt: { cs: 'Tomáš Štverák na UTMB', en: 'Tomáš Štverák at UTMB' } }
       ]
+    },
+    {
+      slug: 'tereza-siruckova',
+      name: 'Tereza Širůčková',
+      accent: '#4fc8ff',
+      sport: { cs: 'Lezení na obtížnost', en: 'Lead climbing' },
+      tagline: { cs: 'Profesionální lezkyně a reprezentantka ČR. TOP 10 Světového poháru, první 9a na skalách.', en: 'Professional climber and Czech national team member. World Cup TOP 10, first 9a on rock.' },
+      hero: { word: '9A', background: 'assets/athletes/tereza-siruckova/hero.webp', cutout: 'assets/athletes/tereza-siruckova/cutout.webp' },
+      photo: 'assets/athletes/tereza-siruckova/portrait.webp',
+      cardPhoto: 'assets/athletes/tereza-siruckova/card.webp',
+      stats: [
+        { value: '9.', label: { cs: 'Světový pohár · Praha 2026', en: 'World Cup · Prague 2026' } },
+        { value: '4.', label: { cs: 'mistrovství Evropy · Laval 2026', en: 'European Championships · Laval 2026' } },
+        { value: '9a', label: { cs: 'první cesta · Hades 2026', en: 'first route · Hades 2026' } }
+      ],
+      story: {
+        title: { cs: 'Od dětského kroužku do TOP 10 Světového poháru.', en: 'From a kids’ club to the World Cup TOP 10.' },
+        paragraphs: {
+          cs: [
+            'Lezu od osmi let. Prošla jsem mládežnickou reprezentací a dnes jako profesionální lezkyně reprezentuji Českou republiku v lezení na obtížnost. Jsem členkou sportovního centra OLYMP.',
+            'Dlouho jsem závodila v obtížnosti i boulderingu, ve kterém jsem vyhrála Český pohár. Nakonec jsem se rozhodla zaměřit závodní přípravu naplno na obtížnost. Zásadní posun přinesla spolupráce s trenérem Petrem Klofáčem. Během přibližně dvou let jsem se z umístění kolem 50. místa na Světových pohárech dostala až do TOP 10.',
+            'Na skalách jsem se posunula z 8b+ k prvnímu 9a a v boulderingu ze 7A na 8B. Závody a skály vnímám jako jedno lezení. Zkušenosti z obou prostředí se vzájemně promítají do mého výkonu.'
+          ],
+          en: [
+            'I’ve been climbing since I was eight. I came up through the youth national team and today, as a professional climber, I represent the Czech Republic in lead climbing. I’m a member of the OLYMP sports centre.',
+            'For a long time I competed in both lead and bouldering, where I won the Czech Cup. Eventually I decided to focus my competition training fully on lead. The big step forward came with coach Petr Klofáč. In about two years I went from around 50th place at World Cups to the TOP 10.',
+            'On rock I progressed from 8b+ to my first 9a, and in bouldering from 7A to 8B. I see competitions and rock as one kind of climbing. What I learn in each shapes my performance in the other.'
+          ]
+        },
+        quote: { cs: 'Závody a skály vnímám jako jedno lezení.', en: 'Competitions and rock are one kind of climbing to me.' }
+      },
+      achievements: [
+        { value: '9.', title: { cs: 'Světový pohár Praha', en: 'World Cup Prague' }, detail: { cs: '2026 · lezení na obtížnost', en: '2026 · lead climbing' } },
+        { value: '4.', title: { cs: 'Mistrovství Evropy, Laval', en: 'European Championships, Laval' }, detail: { cs: '2026', en: '2026' } },
+        { value: '1.', title: { cs: 'Mistryně České republiky', en: 'Czech Champion' }, detail: { cs: '2026 · lezení na obtížnost', en: '2026 · lead climbing' } },
+        { value: '3.', title: { cs: 'Evropské hry, Krakov', en: 'European Games, Kraków' }, detail: { cs: '2023', en: '2023' } },
+        { value: '9a', title: { cs: 'Hades', en: 'Hades' }, detail: { cs: '2026 · první cesta obtížnosti 9a', en: '2026 · first 9a route' } },
+        { value: '8c+', icon: 'flag', title: { cs: 'C’est la vie', en: 'C’est la vie' }, detail: { cs: '2025 · první ženský přelez', en: '2025 · first female ascent' } },
+        { value: '8B', title: { cs: 'Odysseus', en: 'Odysseus' }, detail: { cs: '2026 · OS – na první pokus bez předchozí znalosti', en: '2026 · onsight – first try with no prior knowledge' } },
+        { value: '8B', title: { cs: 'Rustam Direct', en: 'Rustam Direct' }, detail: { cs: '2025 · skalní bouldering, na třetí pokus', en: '2025 · rock bouldering, third try' } }
+      ],
+      goals: {
+        title: { cs: 'Cíle do roku<br>2028 a dál.', en: 'Goals for 2028<br>and beyond.' },
+        intro: { cs: 'Teď mají prioritu závody. Skalní cíle nemají pevný termín. Chci posouvat své limity zdravě, dlouhodobě a s radostí.', en: 'Competitions come first right now. Rock goals have no fixed date. I want to push my limits in a healthy, long-term way and with joy.' },
+        items: [
+          { label: 'FINÁLE SP', title: { cs: 'Finále Světového poháru', en: 'World Cup final' }, detail: { cs: 'Navázat na deváté místo z Prahy a dostat se mezi finálovou osmičku.', en: 'Build on 9th place in Prague and make the final eight.' } },
+          { label: 'OH 2028', title: { cs: 'Olympijská kvalifikace', en: 'Olympic qualification' }, detail: { cs: 'Postoupit do olympijské kvalifikace a zabojovat o účast na hrách.', en: 'Reach Olympic qualification and fight for a place at the Games.' } },
+          { label: '8C', title: { cs: 'Boulder 8C', en: '8C boulder' }, detail: { cs: 'Dokončit rozpracovaný boulder. Dvakrát jsem ho přelezla bez posledních čtyř kroků.', en: 'Finish a project boulder I’ve climbed twice minus the last four moves.' } },
+          { label: '9A', title: { cs: 'První ženské 9a v Česku a na českém písku', en: 'First female 9a in Czechia and on Czech sandstone' }, detail: { cs: 'Dokončit cestu, kterou mám zkrokovanou a přelezenou bez dvou kroků.', en: 'Finish a route I’ve worked out and climbed minus two moves.' } },
+          { label: '9B', title: { cs: '9b, případně 9b+', en: '9b, possibly 9b+' }, detail: { cs: 'Posunout svou maximální obtížnost na laně.', en: 'Raise my maximum grade on the rope.' } }
+        ]
+      },
+      partnerOffer: {
+        text: { cs: 'Chci spolupracovat se značkami, kterým věřím. Do spolupráce přináším zkušenosti z profesionálního sportu, poctivou zpětnou vazbu a vlastní pohled na to, co mi při přípravě i výkonu pomáhá. Do spolupráce chci dát stejné nasazení jako do lezení.', en: 'I want to work with brands I believe in. I bring experience from professional sport, honest feedback and my own view of what helps me in training and performance. I want to give a partnership the same commitment I give to climbing.' },
+        items: {
+          cs: ['Dlouhodobé ambasadorství a partnerství během závodní sezony', 'Podpora konkrétního skalního projektu nebo výjezdu', 'Instagram: reels, stories a společné příspěvky', 'Foto a video obsah z přípravy, závodů a skal', 'Testování vybavení a zpětná vazba z pravidelného používání', 'Společný obsah o přípravě, regeneraci a zdravém přístupu k výkonu'],
+          en: ['Long-term ambassadorship and partnership through the competition season', 'Support for a specific rock project or trip', 'Instagram: reels, stories and joint posts', 'Photo and video content from training, competitions and rock', 'Gear testing and feedback from regular use', 'Joint content on training, recovery and a healthy approach to performance']
+        },
+        reach: [
+          { value: '3 029', label: { cs: 'sledujících na Instagramu', en: 'Instagram followers' } },
+          { value: 'TOP 10', label: { cs: 'Světového poháru', en: 'World Cup' } }
+        ]
+      },
+      socials: [
+        { label: 'Instagram', url: 'https://www.instagram.com/teri_siruckova/' }
+      ],
+      partners: [
+        { name: 'Hlavní partner', tier: 'main', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true }
+      ],
+      gallery: [
+        { src: 'assets/athletes/tereza-siruckova/gallery-1.webp', alt: { cs: 'Tereza Širůčková na skále', en: 'Tereza Širůčková on rock' } },
+        { src: 'assets/athletes/tereza-siruckova/gallery-2.webp', alt: { cs: 'Tereza Širůčková na závodě', en: 'Tereza Širůčková competing' } },
+        { src: 'assets/athletes/tereza-siruckova/gallery-3.webp', alt: { cs: 'Lezení na obtížnost', en: 'Lead climbing' } },
+        { src: 'assets/athletes/tereza-siruckova/gallery-4.webp', alt: { cs: 'Tereza Širůčková po přelezu', en: 'Tereza Širůčková after a climb' } },
+        { src: 'assets/athletes/tereza-siruckova/gallery-5.webp', alt: { cs: 'Skalní lezení s lanem', en: 'Rope climbing on rock' } },
+        { src: 'assets/athletes/tereza-siruckova/gallery-6.webp', alt: { cs: 'Tereza Širůčková v kvalifikaci', en: 'Tereza Širůčková in qualification' } }
+      ]
     }
   ],
 
@@ -294,11 +374,12 @@ window.CONTENT = {
   featured: [
     { athlete: 'jana-svecova', title: 'JANA „CLIMBING JANE“ ŠVECOVÁ' },
     { athlete: 'patrik-vebr', title: 'PATRIK VEBR' },
-    { athlete: 'tomas-stverak', title: 'TOMÁŠ ŠTVERÁK' }
+    { athlete: 'tomas-stverak', title: 'TOMÁŠ ŠTVERÁK' },
+    { athlete: 'tereza-siruckova', title: 'TEREZA ŠIRŮČKOVÁ' }
   ],
 
   /* Sportovci zobrazení na hlavní stránce v sekci „The Renegades“ (slugy, v tomto pořadí). */
-  homeAthletes: ['jana-svecova', 'patrik-vebr', 'tomas-stverak'],
+  homeAthletes: ['jana-svecova', 'patrik-vebr', 'tomas-stverak', 'tereza-siruckova'],
 
   /* ---------- ZNAČKA ----------
      logo        … soubor loga agentury (SVG). null = zobrazí se textový nápis PUSHING RENEGADES.
@@ -571,7 +652,7 @@ window.CONTENT = {
       cs: 'Výkon je váš. Pozornost zařídíme my. Sportovní PR pro ty, kteří si svou cestu musí vydřít.',
       en: 'Your performance. Our push. Sports PR for those who earn every step of their own path.'
     },
-    heroDisciplines: 'BOULDERING / MARATHON / ULTRA TRAIL',
+    heroDisciplines: 'BOULDERING / LEAD / MARATHON / ULTRA TRAIL',
     tape: ['WE PUSH RENEGADES ↗', 'PUBLIC RELATIONS × PERSONAL RECORDS', 'PUSH. PUSH. PUSH.'],
 
     stance: {
