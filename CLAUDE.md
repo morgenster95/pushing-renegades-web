@@ -16,16 +16,22 @@ Komunikace s uživatelem česky.
 | `web/app.js` | Šablony stránek a chování (karusel, profil, menu, formulář, animace odhalení). |
 | `web/effects.js` | Prach/vítr ve scéně (`initDust`), cílová páska přes nadpis (`initFinishLine`). |
 | `web/style.css` | Veškerý vzhled (jeden soubor). |
-| `web/assets/athletes/<slug>/` | Fotky sportovce: `cutout`, `hero`, `portrait`, `card`, `gallery-1…6` (.webp). |
+| `web/assets/athletes/<slug>/` | Fotky sportovce: `cutout`, `hero`, `portrait`, `card`, `gallery-1…6` (.webp), loga partnerů v `partneri/`. |
+| `web/assets/partneri/` | Loga partnerů agentury a projektů (SVG). |
 | `tools/optimize-images.py` | Převod fotek do .webp (max 1800 px, průhlednost zachová). |
 | `podklady-sport/` | Zdrojové prezentace a fotky sportovců – **v .gitignore, nikdy necommitovat** (osobní telefony/e-maily). |
 
-Podstránky přes URL: `?page=athletes`, `?athlete=<slug>`, `&lang=en`.
+Podstránky přes URL: `?page=athletes`, `?page=media`, `?athlete=<slug>`, `?project=<slug>` (k2, rekord, tracking), `&lang=en`.
 
 ## Rozhodnutí (dodržovat)
 
 - **Vizuál:** jen směr *RAW / Break the Frame* (tmavá `#171817` + acid žlutá `#edff38`, Barlow Condensed / DM Sans / IBM Plex Mono). Ostatní koncepty, palety a přepínače byly odstraněny – nevracet.
-- **Sportovci:** jen Jana Švecová, Patrik Vebr, Tomáš Štverák. Další přidávat až s dodanými podklady.
+- **Název:** Pushing Renegades. „We Push Renegades“ jen občas jako claim. Je to sportovní PR agentura (s.r.o. ve vzniku).
+- **Sportovci:** jen Jana Švecová, Patrik Vebr, Tomáš Štverák. Další (Jakub Váňa, Tomáš Petreček, Bára Závodník, Tereza Širůčková…) přidávat až s dodanými podklady. Agostino, Procházka, Ondra nejsou potvrzení – nezveřejňovat.
+- **Projekty** (K2, film Rekord, Tracking s Pavlem Paloncým) mají vlastní podstránky na šabloně profilu. Nové projekty jen přidat do `projects` v content.js.
+- **Partneři** jsou zvlášť pro agenturu (HP), pro každý projekt a pro každého sportovce – každý má jiná loga. Pravidla pro dodávání log jsou v README (SVG, průhledné, bez podkladu; web je zobrazuje jednobarevně bíle a dorovnává velikost podle poměru stran). Mixit, Alza, HUDY, Leki, Česká spořitelna, Shoptet jsou zatím jen záměry – nezobrazovat jejich loga bez podpisu.
+- **Mockupy:** neověřené texty a loga mají `draft: true` → štítek MOCKUP (`brand.showDrafts`). Nevymýšlet fakta o skutečných lidech; mockup psát obecně.
+- **Design je hotový** – nové sekce skládat z existujících prvků (scéna, karty, časová osa, žlutý blok Pro partnery), nepřestavovat.
 - **Barva sportovce** (`accent` v content.js) se použije na jeho profilu a kartě: Jana `#ff4fa0`, Patrik `#ffd400`, Tomáš `#ff6a1a`. Karusel na hlavní stránce zůstává žlutý.
 - **Kontakty:** na web nedávat osobní telefony ani e-maily sportovců/manažerů. Poptávky jdou přes formulář agentury (předvyplní jméno sportovce).
 - **Profil sportovce** = scéna jako na HP (výřez postavy + velké slovo v barvě sportovce + prach), pod ní čísla (časomíra), Moje cesta (velká fotka vlevo, text vpravo), Úspěchy (karty s ikonami), Cíle, případně Mimo závody (charita), Pro partnery (zkrácená obchodní sekce), galerie 6 fotek, kontakt. Sekce bez dat se nezobrazí.
@@ -48,3 +54,6 @@ Podstránky přes URL: `?page=athletes`, `?athlete=<slug>`, `&lang=en`.
 - Loga partnerů sportovců (Jana má v prezentaci jen jako obrázek) a případně YouTube video Jany.
 - Výřez Tomáše je malý (362×1012 px) – při dodání většího vyměnit.
 - Favicon a OG náhled pro sdílení.
+- Logo agentury (`brand.logo`), úvodní spot (`film.video` + `videoVertical`, premiéra leden 2027), teaser filmu Rekord.
+- Texty od Honzy Vernera místo mockupů (mise/vize/filozofie, projekty, FAQ, tisková zpráva); prezentace K2 od Aničky.
+- E-maily info@ a media@ (David Lekeš). Domény: pushingrenegades.com/.cz + varianty s pomlčkou a push… – zvolit hlavní, ostatní přesměrovat.

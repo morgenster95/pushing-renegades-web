@@ -1,14 +1,16 @@
 /*
   Vykreslení webu. Texty, sportovci a fotky jsou v content.js – tady je jen šablona a chování.
-  Podstránky běží přes parametry URL: ?page=athletes, ?athlete=<slug>, &lang=en
+  Podstránky běží přes parametry URL: ?page=athletes, ?page=media, ?athlete=<slug>, ?project=<slug>, &lang=en
 */
 const C = window.CONTENT;
 const athletes = C.athletes;
+const projects = C.projects || [];
 
 const params = new URLSearchParams(location.search);
 let lang = params.get('lang') === 'en' ? 'en' : 'cs';
 let athlete = athletes.findIndex(a => a.slug === params.get('athlete'));
-let page = params.get('page') === 'athletes' ? 'athletes' : 'home';
+let project = athlete >= 0 ? -1 : projects.findIndex(p => p.slug === params.get('project'));
+let page = ['athletes', 'media'].includes(params.get('page')) ? params.get('page') : 'home';
 let motionOff = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- pomocníci ---------- */
@@ -17,19 +19,31 @@ const t = (cs, enText) => en() ? enText : cs;
 // Text z content.js: buď prostý řetězec, nebo { cs, en }.
 const L = value => value && typeof value === 'object' && !Array.isArray(value) ? (value[lang] ?? value.cs) : value;
 const pad = n => String(n).padStart(2, '0');
+// Čísla sekcí (01 / …) se doplní až podle pořadí ve výsledné stránce.
+const NUM = '%%N%%';
+const numbered = html => { let n = 0; return html.replace(/%%N%%/g, () => pad(++n)); };
 const bySlug = slug => athletes.findIndex(a => a.slug === slug);
 
 const url = (i = -1, hash = '') => `?lang=${lang}${i >= 0 ? '&athlete=' + athletes[i].slug : ''}${hash ? '#' + hash : ''}`;
 const rosterUrl = () => `?lang=${lang}&page=athletes`;
+const pageUrl = name => `?lang=${lang}&page=${name}`;
+const projectUrl = (k, hash = '') => `?lang=${lang}&project=${projects[k].slug}${hash ? '#' + hash : ''}`;
+const currentUrl = () => athlete >= 0 ? url(athlete) : project >= 0 ? projectUrl(project) : page !== 'home' ? pageUrl(page) : url();
+// Odkaz z content.js: '?athlete=x' / '?project=x' dostane jazyk, ostatní odkazy zůstanou.
+const link = u => u && u.startsWith('?') ? `?lang=${lang}&${u.slice(1)}` : u;
+// Štítek MOCKUP u položek s draft: true (vypíná brand.showDrafts v content.js).
+const draftTag = o => o && o.draft && C.brand && C.brand.showDrafts ? '<span class="draft-tag">MOCKUP</span>' : '';
 const img = (src, alt, loading = 'lazy', cls = '') => `<img src="${src}" alt="${alt}" loading="${loading}"${cls ? ` class="${cls}"` : ''}>`;
 const button = (text, href, ghost = false) => `<a class="button ${ghost ? 'ghost' : ''}" href="${href}">${text}<span aria-hidden="true">↗</span></a>`;
 const anyIllustrative = list => list.some(a => a.illustrative);
 
 /* ---------- navigace ---------- */
+// Logo agentury: brand.logo (SVG) v content.js, jinak textový nápis.
+const wordmark = () => `<a class="wordmark${C.brand && C.brand.logo ? ' has-logo' : ''}" href="${url()}" aria-label="Pushing Renegades — ${t('úvod', 'home')}">${C.brand && C.brand.logo ? `<img class="brand-logo" src="${C.brand.logo}" alt="Pushing Renegades">` : 'PUSHING<br>RENEGADES<b>↗</b>'}</a>`;
 function nav() {
-  const links = `<a href="${rosterUrl()}">${t('Sportovci', 'Athletes')}</a><a href="${url(-1, 'approach')}">${t('Náš přístup', 'Our approach')}</a><a href="${url(-1, 'services')}">${t('Co děláme', 'What we do')}</a>`;
+  const links = `<a href="${rosterUrl()}">${t('Sportovci', 'Athletes')}</a><a href="${url(-1, 'projects')}">${t('Projekty', 'Projects')}</a><a href="${url(-1, 'services')}">${t('Co děláme', 'What we do')}</a><a href="${pageUrl('media')}">${t('Média', 'Press')}</a>`;
   return `<header class="site-nav">
-    <a class="wordmark" href="${url()}" aria-label="Pushing Renegades — ${t('úvod', 'home')}">PUSHING<br>RENEGADES<b>↗</b></a>
+    ${wordmark()}
     <nav id="main-nav" aria-label="${t('Hlavní navigace', 'Main navigation')}">${links}<a class="nav-cta" href="#contact">${t('Pojďme do toho', 'Let’s make moves')} ↗</a></nav>
     <div class="nav-tools">
       <button id="language" aria-label="${en() ? 'Switch to Czech' : 'Přepnout do angličtiny'}">${en() ? 'CS' : 'EN'}</button>
@@ -50,7 +64,7 @@ function sceneLayers(sc, alt, loading = 'eager') {
       <div class="scene-fog" aria-hidden="true"><i></i><i></i></div>
       <div class="scene-lines" aria-hidden="true"></div>
       <div class="scene-word" aria-hidden="true">${sc.word || ''}</div>
-      <div class="scene-figure">${img(sc.cutout, alt, loading)}</div>
+      ${sc.cutout ? `<div class="scene-figure">${img(sc.cutout, alt, loading)}</div>` : ''}
       <div class="scene-grit" aria-hidden="true"></div>`;
 }
 
@@ -103,23 +117,220 @@ function card(i) {
 function home() {
   const h = C.home;
   const homeList = C.homeAthletes.map(bySlug).filter(i => i >= 0);
+  const num = () => NUM;
+  const pillars = has(h.pillars) ? `<dl class="pillars">${h.pillars.map(x => `<div><dt>${L(x.label)}${draftTag(x)}</dt><dd>${L(x.text)}</dd></div>`).join('')}</dl>` : '';
+  const featuredProjects = projects.map((p, k) => p.featured ? k : -1).filter(k => k >= 0);
+  const otherProjects = projects.map((p, k) => p.featured ? -1 : k).filter(k => k >= 0);
+  const projectsSection = projects.length ? `<section id="projects" class="section projects-section">
+    <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Projekty', 'Projects')}</span><h2>${L(h.projects.title)}</h2></div><p>${L(h.projects.text)}</p></div>
+    ${featuredProjects.length ? `<div class="project-grid">${featuredProjects.map(k => projectCard(k)).join('')}</div>` : ''}
+    ${otherProjects.length ? `<div class="project-rows">${otherProjects.map(projectRow).join('')}</div>` : ''}
+  </section>` : '';
+  const partners = C.partners && has(C.partners.tiers) ? partnersSection(C.partners.tiers, `${num()} / ${t('Partneři', 'Partners')}`, L(C.partners.title), L(C.partners.text), 'partners') : '';
+  const news = has(C.news) ? newsSection(C.news.slice(0, 4), `${num()} / ${t('Aktuality', 'News')}`) : '';
   return `${hero()}
   <section id="approach" class="section manifesto">
-    <div><span class="eyebrow">01 / ${L(h.stance.eyebrow)}</span><div class="pr-stamp">PR<span>↗</span></div><p class="pr-lines">PUBLIC RELATIONS<br>PERSONAL RECORDS<br>PUSHING RENEGADES</p></div>
-    <div><div class="finish-line"><h2 class="finish-title">${L(h.stance.title).split('<br>').map((line, i) => `<span style="--i:${i}">${line}</span>`).join('')}</h2></div>${L(h.stance.paragraphs).map(p => `<p>${p}</p>`).join('')}</div>
+    <div><span class="eyebrow">${num()} / ${L(h.stance.eyebrow)}</span><div class="pr-stamp">PR<span>↗</span></div><p class="pr-lines">PUBLIC RELATIONS<br>PERSONAL RECORDS<br>PUSHING RENEGADES</p></div>
+    <div><div class="finish-line"><h2 class="finish-title">${L(h.stance.title).split('<br>').map((line, i) => `<span style="--i:${i}">${line}</span>`).join('')}</h2></div>${L(h.stance.paragraphs).map(p => `<p>${p}</p>`).join('')}${pillars}</div>
   </section>
+  ${C.film ? filmBand(C.film, 'home') : ''}
   <section id="athletes" class="section">
-    <div class="section-head"><div><span class="eyebrow">02 / THE RENEGADES</span><h2>${L(h.renegades.title)}</h2></div><p>${L(h.renegades.text)}</p></div>
+    <div class="section-head"><div><span class="eyebrow">${num()} / THE RENEGADES</span><h2>${L(h.renegades.title)}</h2></div><p>${L(h.renegades.text)}</p></div>
     <div class="athletes">${homeList.map(card).join('')}</div>
     <div class="roster-link">${button(t('Všichni sportovci', 'All athletes'), rosterUrl(), true)}</div>
     ${anyIllustrative(homeList.map(i => athletes[i])) ? `<p class="note">${t('Fotografie jsou ilustrační a nezobrazují uvedené sportovce.', 'Photographs are illustrative and do not depict the listed athletes.')}</p>` : ''}
   </section>
+  ${projectsSection}
   <section id="services" class="section services">
-    <div><span class="eyebrow">03 / THE PUSH</span><h2>${L(h.services.title)}</h2></div>
+    <div><span class="eyebrow">${num()} / THE PUSH</span><h2>${L(h.services.title)}</h2></div>
     <div>${h.services.items.map((s, i) => `<div class="service"><small>${pad(i + 1)}</small><div><h3>${L(s.title)}</h3><p>${L(s.text)}</p></div></div>`).join('')}</div>
   </section>
+  ${partners}${news}
   <div class="landscape">${img(h.landscape.image, L(h.landscape.alt))}<p>${L(h.landscape.text)}</p></div>
   ${contact()}`;
+}
+
+/* ---------- projekty: karta, řádek ---------- */
+function projectCard(k) {
+  const p = projects[k];
+  return `<a class="athlete project-card" href="${projectUrl(k)}"${p.accent ? ` style="--accent:${p.accent}"` : ''}>
+    <div class="picture">${img(p.hero.background, '', 'lazy')}<span class="project-word" aria-hidden="true">${p.hero.word || p.title}</span><span class="number">${L(p.kicker)}${draftTag(p)}</span><span class="arrow" aria-hidden="true">↗</span></div>
+    <div class="caption"><h3>${p.title}</h3><small>${t('Detail projektu', 'Explore project')} ↗</small></div>
+    ${p.tagline ? `<p class="project-tagline">${L(p.tagline)}</p>` : ''}
+  </a>`;
+}
+function projectRow(k) {
+  const p = projects[k];
+  return `<a class="project-row" href="${projectUrl(k)}"><small>${L(p.kicker)}${draftTag(p)}</small><h3>${p.title}</h3><p>${L(p.tagline) || ''}</p><span class="arrow" aria-hidden="true">↗</span></a>`;
+}
+
+/* ---------- loga partnerů ----------
+   Každé logo sedí ve stejně vysokém rámečku. Po načtení se výška dorovná podle poměru stran
+   (široká loga se zmenší, čtvercová zvětší), aby všechna působila stejně velká. Viz README → Loga partnerů. */
+function logoItem(p) {
+  const name = L(p.name) || '';
+  const inner = p.logo
+    ? `<img class="logo-img${p.color ? ' logo-color' : ''}" src="${p.logo}" alt="${name}" loading="lazy">`
+    : `<span class="logo-placeholder"><b>LOGO</b><small>${name}</small></span>`;
+  return p.url
+    ? `<li><a class="logo-slot" href="${p.url}" target="_blank" rel="noopener" title="${name}">${inner}</a></li>`
+    : `<li><span class="logo-slot" title="${name}">${inner}</span></li>`;
+}
+const logoWall = (items, tier = 'partner') => `<ul class="logo-wall logo-${tier}">${items.map(logoItem).join('')}</ul>`;
+const tierBlocks = tiers => tiers.filter(x => has(x.items)).map(x => `<div class="logo-tier"><span class="eyebrow">${L(x.title)}</span>${logoWall(x.items, x.tier)}</div>`).join('');
+
+function partnersSection(tiers, eyebrow, title, text, id) {
+  const blocks = tierBlocks(tiers || []);
+  if (!blocks) return '';
+  return `<section${id ? ` id="${id}"` : ''} class="section partners-section">
+    <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${title}</h2></div>${text ? `<p>${text}</p>` : ''}</div>
+    ${blocks}
+  </section>`;
+}
+
+// Partneři sportovce: ploché pole s tier 'main' / 'partner' / 'media' → skupiny.
+function athleteTiers(list) {
+  const pick = tier => list.filter(p => (p.tier || 'partner') === tier);
+  return [
+    { tier: 'general', title: { cs: 'Hlavní partner', en: 'Main partner' }, items: pick('main') },
+    { tier: 'partner', title: { cs: 'Partneři', en: 'Partners' }, items: pick('partner') },
+    { tier: 'media', title: { cs: 'Mediální partneři', en: 'Media partners' }, items: pick('media') }
+  ];
+}
+
+function initLogos() {
+  document.querySelectorAll('.logo-img').forEach(el => {
+    const fit = () => {
+      if (!el.naturalWidth) return;
+      const ratio = el.naturalWidth / el.naturalHeight;
+      el.style.setProperty('--k', Math.min(1.3, Math.max(.55, Math.sqrt(2.4 / ratio))).toFixed(3));
+    };
+    if (el.complete) fit(); else el.addEventListener('load', fit, { once: true });
+  });
+}
+
+/* ---------- video pás (úvodní spot / video projektu) ---------- */
+function filmBand(f, key) {
+  const ready = f.video || f.videoVertical;
+  return `<section class="film-band">
+    <div class="film-frame">
+      ${img(f.poster, '', 'lazy')}<div class="film-shade" aria-hidden="true"></div>
+      <div class="film-copy">
+        <span class="eyebrow">${L(f.eyebrow) || 'VIDEO'}${draftTag(f)}</span>
+        ${(f.lines || []).map(l => `<p>${L(l)}</p>`).join('')}
+        ${f.claim ? `<h2>${L(f.claim)}</h2>` : ''}
+      </div>
+      <button class="film-play" data-action="film" data-film="${key}" aria-label="${t('Přehrát video', 'Play video')}"><span aria-hidden="true">▷</span><small>${ready ? t('Přehrát', 'Play') : (L(f.premiere) || t('Video připravujeme', 'Coming soon'))}</small></button>
+    </div>
+  </section>`;
+}
+
+/* ---------- aktuality ---------- */
+function newsSection(items, eyebrow) {
+  return `<section class="section news-section">
+    <div class="section-head"><div><span class="eyebrow">${eyebrow}</span><h2>${t('Co je<br>nového.', 'What’s<br>new.')}</h2></div></div>
+    <ul class="news-grid">${items.map(x => {
+      const body = `<small>${L(x.date)}${draftTag(x)}</small><h3>${L(x.title)}</h3>${x.text ? `<p>${L(x.text)}</p>` : ''}${x.url ? '<span class="arrow" aria-hidden="true">↗</span>' : ''}`;
+      return `<li>${x.url ? `<a href="${link(x.url)}">${body}</a>` : `<div>${body}</div>`}</li>`;
+    }).join('')}</ul>
+  </section>`;
+}
+
+/* ---------- sekce Pro partnery (sportovec i projekt) ---------- */
+function offerSection(o, eyebrow, buttonLabel) {
+  if (!o) return '';
+  return `<section id="partners" class="section partner-offer">
+    <div><span class="eyebrow">${eyebrow}</span><h2>${t('Pojďme do toho<br>spolu.', 'Let’s do this<br>together.')}</h2>
+      ${has(o.reach) ? `<dl class="reach">${o.reach.map(r => `<div><dt>${L(r.value)}</dt><dd>${L(r.label)}</dd></div>`).join('')}</dl>` : ''}</div>
+    <div><p class="offer-text">${L(o.text)}</p>
+      <ul class="offer-list">${(L(o.items) || []).map(x => `<li>${x}</li>`).join('')}</ul>
+      ${button(buttonLabel || t('Poptat spolupráci', 'Request a partnership'), '#contact')}</div>
+  </section>`;
+}
+
+/* ---------- Moje cesta / příběh ---------- */
+function storySection(story, eyebrow, photo, alt) {
+  if (!story) return '';
+  const head = `<span class="eyebrow">${eyebrow}</span><h2>${L(story.title)}</h2>`;
+  const paras = (L(story.paragraphs) || []).map(p => `<p>${p}</p>`).join('');
+  const quote = story.quote ? `<blockquote>„${L(story.quote)}“</blockquote>` : '';
+  return photo
+    ? `<section class="section story story-with-photo">
+    <figure class="story-photo">${img(photo, alt)}</figure>
+    <div class="story-text">${head}${paras}${quote}</div>
+  </section>`
+    : `<section class="section story">
+    <div>${head}${quote}</div>
+    <div>${paras}</div>
+  </section>`;
+}
+
+/* ---------- podstránka projektu ---------- */
+function projectPage(k) {
+  const p = projects[k];
+  const next = (k + 1) % projects.length;
+  const num = () => NUM;
+  const stats = has(p.stats) ? `<section class="profile-stats-band"><dl class="profile-stats">${p.stats.map(s => `<div><dt>${L(s.value)}</dt><dd>${L(s.label)}</dd></div>`).join('')}</dl></section>` : '';
+  const team = has(p.team) ? timeline({
+    title: { cs: 'Kdo za tím<br>stojí.', en: 'Who’s<br>behind it.' },
+    items: p.team.map(m => {
+      const i = m.athlete ? bySlug(m.athlete) : -1;
+      return { label: i >= 0 ? `<a href="${url(i)}">${m.name} ↗</a>` : m.name, title: m.role, detail: m.detail };
+    })
+  }, `${num()} / ${t('Tým', 'Team')}`, 'team') : '';
+  const story = storySection(p.story, `${num()} / ${t('Příběh', 'The story')}`);
+  const plan = p.timeline ? timeline(p.timeline, `${num()} / ${t('Plán', 'The plan')}`) : '';
+  const offer = offerSection(p.offer, `${num()} / ${t('Pro partnery', 'For partners')}`, t('Chci být partnerem', 'Become a partner'));
+  const partners = partnersSection(p.partners, `${num()} / ${t('Partneři projektu', 'Project partners')}`, t('S kým<br>to táhneme.', 'Who we<br>push with.'), '', 'project-partners');
+  const cta = p.offer ? '#partners' : '#contact';
+  return `<div class="athlete-profile project-page"${p.accent ? ` style="--accent:${p.accent}"` : ''}>
+  <div class="profile-back"><a class="eyebrow" href="${url(-1, 'projects')}">← ${t('Všechny projekty', 'All projects')}</a><span class="eyebrow">${t('PROJEKT', 'PROJECT')} / ${pad(k + 1)} / ${pad(projects.length)}${draftTag(p)}</span></div>
+  <section class="profile-stage cinematic${p.hero.cutout ? '' : ' no-figure'}" aria-label="${p.title}">
+    <div class="depth-stage"><div class="depth-slide is-current">
+      ${sceneLayers(p.hero, p.title)}
+      <div class="scene-copy profile-scene-copy">
+        <span class="scene-index">${L(p.kicker)}</span>
+        <h1>${p.title}</h1>
+        ${p.tagline ? `<p>${L(p.tagline)}</p>` : ''}
+        <div class="profile-actions">${button(p.offer ? t('Partnerství', 'Partnership') : t('Mám zájem', 'I’m interested'), cta)}</div>
+      </div>
+      ${p.illustrative ? `<span class="scene-caption">${t('ILUSTRAČNÍ FOTO', 'ILLUSTRATIVE PHOTO')}</span>` : ''}
+      <span class="scene-cross" aria-hidden="true">+</span>
+    </div></div>
+  </section>
+  ${stats}${story}${plan}${team}
+  ${p.video ? filmBand({ eyebrow: { cs: 'Video', en: 'Video' }, premiere: { cs: 'Video připravujeme', en: 'Coming soon' }, ...p.video }, 'project') : ''}
+  ${offer}${partners}
+  ${contact(L(p.inquiry))}
+  ${projects.length > 1 ? `<section class="section next-athlete"><span class="eyebrow">${t('DALŠÍ PROJEKT', 'NEXT PROJECT')}</span>${button(projects[next].title, projectUrl(next), true)}</section>` : ''}
+  </div>`;
+}
+
+/* ---------- média ---------- */
+function mediaPage() {
+  const m = C.media;
+  const num = () => NUM;
+  const press = has(m.press) ? timeline({
+    title: { cs: 'Tiskové<br>zprávy.', en: 'Press<br>releases.' },
+    items: m.press.map(x => ({ label: x.date, title: { cs: L(x.title) + draftTag(x), en: L(x.title) + draftTag(x) }, detail: L(x.text) + (x.file ? ` <a class="inline-link" href="${x.file}" download>${t('Stáhnout PDF', 'Download PDF')} ↗</a>` : '') }))
+  }, `${num()} / ${t('Tiskové zprávy', 'Press releases')}`, 'press') : '';
+  const c = m.contact;
+  const kit = c || m.kit ? `<section class="section partner-offer media-contact">
+    <div><span class="eyebrow">${num()} / ${L(c.name)}${draftTag(c)}</span><h2>${t('Napište<br>nám.', 'Get in<br>touch.')}</h2>
+      <p class="offer-text">${L(c.text)}</p><a class="media-email" href="mailto:${c.email}">${c.email} ↗</a></div>
+    <div><p class="offer-text"><strong>PRESS KIT</strong></p>
+      <ul class="offer-list">${(L(m.kit.items) || []).map(x => `<li>${x}</li>`).join('')}</ul>
+      ${m.kit.file ? button(t('Stáhnout press kit', 'Download press kit'), m.kit.file) : button(t('Press kit připravujeme · napište si o něj', 'Press kit coming soon · ask for it'), '#contact')}</div>
+  </section>` : '';
+  const faq = has(m.faq) ? `<section class="section faq-section">
+    <div class="section-head"><div><span class="eyebrow">${num()} / FAQ</span><h2>${t('Časté<br>otázky.', 'Frequently<br>asked.')}</h2></div></div>
+    <div class="faq">${m.faq.map(x => `<details><summary>${L(x.q)}${draftTag(x)}<span aria-hidden="true">+</span></summary><p>${L(x.a)}</p></details>`).join('')}</div>
+  </section>` : '';
+  return `<section class="section roster-page media-page">
+    <div class="roster-heading"><div><span class="eyebrow">MEDIA / PRESS</span><h1>${L(m.title)}</h1></div><p>${L(m.text)}</p></div>
+  </section>
+  ${press}${kit}${faq}
+  ${contact('', 'media')}`;
 }
 
 /* ---------- všichni sportovci ---------- */
@@ -179,8 +390,7 @@ function achievementIcon(x) {
 function profile(i) {
   const a = athletes[i];
   const next = (i + 1) % athletes.length;
-  let n = 0;
-  const num = () => pad(++n);
+  const num = () => NUM;
 
   const socials = has(a.socials)
     ? `<div class="socials">${a.socials.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join('')}</div>`
@@ -190,16 +400,8 @@ function profile(i) {
     : '';
 
   const storyPhoto = a.hero && a.photo; // portrét je v úvodu jen tehdy, když sportovec nemá scénu
-  const storyText = a.story ? `<span class="eyebrow">${num()} / ${t('Moje cesta', 'My journey')}</span><h2>${L(a.story.title)}</h2>` : '';
-  const story = a.story ? (storyPhoto
-    ? `<section class="section story story-with-photo">
-    <figure class="story-photo">${img(a.photo, a.name)}</figure>
-    <div class="story-text">${storyText}${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
-  </section>`
-    : `<section class="section story">
-    <div>${storyText}${a.story.quote ? `<blockquote>„${L(a.story.quote)}“</blockquote>` : ''}</div>
-    <div>${(L(a.story.paragraphs) || []).map(p => `<p>${p}</p>`).join('')}</div>
-  </section>`) : '';
+  const story = a.story ? storySection(a.story, `${num()} / ${t('Moje cesta', 'My journey')}`, storyPhoto ? a.photo : null, a.name) : '';
+  const values = a.values && has(a.values.items) ? timeline(a.values, `${num()} / ${t('Mise a hodnoty', 'Mission & values')}`) : '';
 
   const achievements = has(a.achievements) ? `<section class="section achievements">
     <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Úspěchy', 'Achievements')}</span><h2>${t('Výsledky,<br>které mluví.', 'Results that<br>speak for themselves.')}</h2></div></div>
@@ -212,14 +414,13 @@ function profile(i) {
   const goals = a.goals && has(a.goals.items) ? timeline(a.goals, `${num()} / ${t('Cíle', 'Goals')}`) : '';
   const impact = a.impact && has(a.impact.items) ? timeline(a.impact, `${num()} / ${t('Mimo závody', 'Beyond racing')}`, 'impact') : '';
 
-  const offer = a.partnerOffer ? `<section id="partners" class="section partner-offer">
-    <div><span class="eyebrow">${num()} / ${t('Pro partnery', 'For partners')}</span><h2>${t('Pojďme do toho<br>spolu.', 'Let’s do this<br>together.')}</h2>
-      ${has(a.partnerOffer.reach) ? `<dl class="reach">${a.partnerOffer.reach.map(r => `<div><dt>${L(r.value)}</dt><dd>${L(r.label)}</dd></div>`).join('')}</dl>` : ''}</div>
-    <div><p class="offer-text">${L(a.partnerOffer.text)}</p>
-      <ul class="offer-list">${(L(a.partnerOffer.items) || []).map(x => `<li>${x}</li>`).join('')}</ul>
-      ${has(a.partners) ? `<div class="partner-logos">${a.partners.map(p => { const inner = p.logo ? img(p.logo, p.name, 'lazy', 'partner-logo') : `<strong>${p.name}</strong>`; return p.url ? `<a href="${p.url}" target="_blank" rel="noopener">${inner}</a>` : `<span>${inner}</span>`; }).join('')}</div>` : ''}
-      ${button(t('Poptat spolupráci', 'Request a partnership'), '#contact')}</div>
+  const myProjects = projects.map((p, k) => (p.athletes || []).includes(a.slug) ? k : -1).filter(k => k >= 0);
+  const projectBlock = myProjects.length ? `<section class="section projects-section">
+    <div class="section-head"><div><span class="eyebrow">${num()} / ${t('Projekty', 'Projects')}</span><h2>${t('Víc než<br>závod.', 'More than<br>a race.')}</h2></div></div>
+    <div class="project-grid">${myProjects.map(k => projectCard(k)).join('')}</div>
   </section>` : '';
+  const offer = offerSection(a.partnerOffer, `${num()} / ${t('Pro partnery', 'For partners')}`);
+  const partners = has(a.partners) ? partnersSection(athleteTiers(a.partners), `${num()} / ${t('Partneři', 'Partners')}`, t('Kdo mě<br>podporuje.', 'Who backs<br>me.'), '', 'athlete-partners') : '';
 
   const tiles = (a.video ? [{ video: true }] : []).concat(a.gallery || []);
   const gallery = has(tiles) ? `<section class="section">
@@ -228,6 +429,8 @@ function profile(i) {
       ? `<button data-action="video" aria-label="${t('Přehrát video', 'Play video')}">${img(a.gallery && a.gallery[0] ? a.gallery[0].src : a.photo, '')}<span class="play">▷</span></button>`
       : `<button data-action="photo" data-src="${g.src}" data-alt="${L(g.alt) || ''}" aria-label="${t('Zvětšit fotografii', 'Enlarge photograph')}">${img(g.src, L(g.alt) || '')}</button>`).join('')}</div>
   </section>` : '';
+
+  const news = has(a.news) ? newsSection(a.news, `${num()} / ${t('Aktuality', 'News')}`) : '';
 
   const actions = `<div class="profile-actions">${socials}${button(t('Spolupráce', 'Partnership'), a.partnerOffer ? '#partners' : '#contact')}</div>`;
   const head = a.hero && a.hero.cutout ? `<div class="profile-back"><a class="eyebrow" href="${rosterUrl()}">← ${t('Všichni renegádi', 'All renegades')}</a><span class="eyebrow">RENEGADE / ${pad(i + 1)} / ${pad(athletes.length)}</span></div>
@@ -257,33 +460,35 @@ function profile(i) {
     </div>
     <div class="profile-image">${img(a.photo, a.name, 'eager')}${a.illustrative ? `<small>${t('ILUSTRAČNÍ SNÍMEK · PORTRÉT K DOPLNĚNÍ', 'ILLUSTRATIVE IMAGE · PORTRAIT TO BE ADDED')}</small>` : ''}</div>
   </section>`}
-  ${story}${achievements}${goals}${impact}${offer}${gallery}
+  ${story}${values}${achievements}${goals}${impact}${projectBlock}${offer}${partners}${gallery}${news}
   ${contact()}
   <section class="section next-athlete"><span class="eyebrow">${t('DALŠÍ RENEGADE', 'NEXT RENEGADE')}</span>${button(athletes[next].name, url(next), true)}</section>
   </div>`;
 }
 
 /* ---------- kontakt ---------- */
-function contact() {
+function contact(prefill = '', kind = 'brand') {
   return `<section id="contact" class="section contact contact-compact"><div class="contact-shell">
     <div class="contact-intro"><div><span class="eyebrow">LET’S PUSH TOGETHER ↗</span><h2>${L(C.contact.title)}</h2></div><p>${L(C.contact.text)}</p></div>
-    <div class="contact-panel">${contactForm()}</div>
+    <div class="contact-panel">${contactForm(prefill, kind)}</div>
   </div></section>`;
 }
 
-function contactForm() {
+function contactForm(prefill = '', kind = 'brand') {
+  const opt = (value, label) => `<label><input type="radio" name="kind" value="${value}"${value === kind ? ' checked' : ''}><span>${label} ↗</span></label>`;
   return `<form class="inquiry-form">
     <fieldset><legend>${t('JAK SE PROPOJÍME?', 'HOW CAN WE CONNECT?')}</legend><div class="inquiry-types">
-      <label><input type="radio" name="kind" value="brand" checked><span>${t('Jsem značka', 'I am a brand')} ↗</span></label>
-      <label><input type="radio" name="kind" value="athlete"><span>${t('Jsem sportovec', 'I am an athlete')} ↗</span></label>
-      <label><input type="radio" name="kind" value="other"><span>${t('Něco jiného', 'Something else')} ↗</span></label>
+      ${opt('brand', t('Jsem značka', 'I am a brand'))}
+      ${opt('athlete', t('Jsem sportovec', 'I am an athlete'))}
+      ${opt('media', t('Jsem z médií', 'I am press'))}
+      ${opt('other', t('Něco jiného', 'Something else'))}
     </div></fieldset>
     <div class="form-grid">
       <label>${t('Tvoje jméno', 'Your name')} *<input name="name" autocomplete="name" required placeholder="${t('Jméno a příjmení', 'Full name')}"></label>
       <label>E-mail *<input type="email" name="email" autocomplete="email" required placeholder="you@example.com"></label>
-      <label class="context-label"><span>${t('Značka / společnost', 'Brand / company')}</span><input name="context" autocomplete="organization" placeholder="${t('Koho zastupuješ?', 'Who do you represent?')}"></label>
+      <label class="context-label"><span>${kind === 'media' ? t('Médium / redakce', 'Outlet / newsroom') : t('Značka / společnost', 'Brand / company')}</span><input name="context" autocomplete="organization" placeholder="${kind === 'media' ? t('Pro koho píšeš?', 'Who do you write for?') : t('Koho zastupuješ?', 'Who do you represent?')}"></label>
       <label>${t('Telefon', 'Phone')}<input name="phone" type="tel" autocomplete="tel" placeholder="+420"></label>
-      <label class="form-wide">${t('Co spolu posuneme?', 'What can we push together?')} *<textarea name="message" required rows="4" placeholder="${t('Pár slov o tvém příběhu, nápadu nebo spolupráci…', 'A few words about your story, idea or partnership…')}">${athlete >= 0 ? t('Mám zájem o spolupráci: ', 'I am interested in working with: ') + athletes[athlete].name + '.' : ''}</textarea></label>
+      <label class="form-wide">${t('Co spolu posuneme?', 'What can we push together?')} *<textarea name="message" required rows="4" placeholder="${t('Pár slov o tvém příběhu, nápadu nebo spolupráci…', 'A few words about your story, idea or partnership…')}">${prefill || (athlete >= 0 ? t('Mám zájem o spolupráci: ', 'I am interested in working with: ') + athletes[athlete].name + '.' : '')}</textarea></label>
     </div>
     <div class="form-bottom"><p>${t('Náhled formuláře · údaje se neukládají ani neodesílají.', 'Form preview · no data is saved or sent.')}</p><button class="button" type="submit">${t('Odeslat', 'Send')} ↗</button></div>
     <p class="form-status" role="status" tabindex="-1"></p>
@@ -291,8 +496,17 @@ function contactForm() {
 }
 
 function footer() {
-  return `<footer><span>${L(C.footer.left)}</span><span>© ${new Date().getFullYear()} · ${L(C.footer.right)}</span>
-    <span class="footer-tools"><button id="motion-toggle" aria-pressed="${!motionOff}">${motionOff ? t('POHYB: VYP', 'MOTION: OFF') : t('POHYB: ZAP', 'MOTION: ON')}</button><a href="#" data-action="credits">${t('Fotografie', 'Photography')} ↗</a></span></footer>`;
+  const b = C.brand || {};
+  const socials = has(b.socials) ? `<div class="socials">${b.socials.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join('')}</div>` : '';
+  return `<footer class="site-footer">
+  <div class="footer-main">
+    <div class="footer-brand">${wordmark()}<p>${L(C.footer.claim) || ''}</p></div>
+    <nav class="footer-links" aria-label="${t('Patička', 'Footer')}"><a href="${rosterUrl()}">${t('Sportovci', 'Athletes')} ↗</a><a href="${url(-1, 'projects')}">${t('Projekty', 'Projects')} ↗</a><a href="${url(-1, 'partners')}">${t('Partneři', 'Partners')} ↗</a><a href="${pageUrl('media')}">${t('Média', 'Press')} ↗</a><a href="#contact">${t('Kontakt', 'Contact')} ↗</a></nav>
+    <div class="footer-contact"><span class="eyebrow">${t('Kontakt', 'Contact')}${draftTag(b.socials && b.socials[0])}</span>${b.email ? `<a class="footer-email" href="mailto:${b.email}">${b.email}</a>` : ''}${socials}</div>
+  </div>
+  <div class="footer-bottom"><span>${L(C.footer.left)}</span><span>© ${new Date().getFullYear()} · ${L(C.footer.right)}</span>
+    <span class="footer-tools"><button id="motion-toggle" aria-pressed="${!motionOff}">${motionOff ? t('POHYB: VYP', 'MOTION: OFF') : t('POHYB: ZAP', 'MOTION: ON')}</button><a href="#" data-action="credits">${t('Fotografie', 'Photography')} ↗</a></span></div>
+  </footer>`;
 }
 
 /* ---------- vykreslení ---------- */
@@ -300,9 +514,10 @@ function render() {
   cleanupMotion();
   document.body.classList.toggle('motion-off', motionOff);
   document.documentElement.lang = lang;
-  document.title = `${athlete >= 0 ? athletes[athlete].name + ' — ' : page === 'athletes' ? t('Sportovci — ', 'Athletes — ') : ''}Pushing Renegades`;
-  const main = athlete >= 0 ? profile(athlete) : page === 'athletes' ? rosterPage() : home();
+  document.title = `${athlete >= 0 ? athletes[athlete].name + ' — ' : project >= 0 ? projects[project].title + ' — ' : page === 'athletes' ? t('Sportovci — ', 'Athletes — ') : page === 'media' ? t('Média — ', 'Press — ') : ''}Pushing Renegades`;
+  const main = numbered(athlete >= 0 ? profile(athlete) : project >= 0 ? projectPage(project) : page === 'athletes' ? rosterPage() : page === 'media' && C.media ? mediaPage() : home());
   document.getElementById('app').innerHTML = nav() + `<main>${main}</main>` + footer();
+  initLogos();
   initMotion();
 }
 
@@ -319,7 +534,7 @@ document.getElementById('modal').addEventListener('close', () => { document.getE
 document.addEventListener('click', e => {
   if (e.target.closest('#language')) {
     lang = en() ? 'cs' : 'en';
-    history.replaceState(null, '', athlete >= 0 ? url(athlete) : page === 'athletes' ? rosterUrl() : url());
+    history.replaceState(null, '', currentUrl());
     render();
     return;
   }
@@ -348,6 +563,13 @@ document.addEventListener('click', e => {
     if (current && current.video) show(`<div class="video-frame"><iframe src="${current.video}" title="Video — ${current.name}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`);
     else show(`<small>VIDEO</small><h2 style="margin-top:25px">${t('Tady poběží<br>skutečný příběh.', 'The real story<br>will play here.')}</h2><p>${t('Video připravujeme.', 'The video is coming soon.')}</p>`);
   }
+  if (action === 'film') {
+    const f = a.dataset.film === 'project' && project >= 0 ? projects[project].video : C.film;
+    const vertical = f.videoVertical && window.matchMedia('(max-width: 600px)').matches;
+    const src = vertical ? f.videoVertical : f.video || f.videoVertical;
+    if (src) show(`<div class="video-frame${vertical ? ' is-vertical' : ''}"><iframe src="${src}" title="Video — Pushing Renegades" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`);
+    else show(`<small>VIDEO</small><h2 style="margin-top:25px">${t('Premiéra<br>se blíží.', 'Premiere<br>is coming.')}</h2><p>${L(f.premiere) || t('Video připravujeme.', 'The video is coming soon.')}</p>`);
+  }
   if (action === 'credits') show(`<h2>${t('Fotografie', 'Photography')}</h2><p>${t('Fotografie sportovců pocházejí z jejich archivů a od fotografů jednotlivých závodů. Krajinné fotografie: Unsplash.', 'Athlete photographs come from the athletes’ own archives and race photographers. Landscape photography: Unsplash.')}</p><p><a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash ↗</a></p>`);
 });
 
@@ -370,8 +592,9 @@ document.addEventListener('change', e => {
   if (e.target.name !== 'kind') return;
   const f = e.target.closest('form');
   const isAthlete = e.target.value === 'athlete';
-  f.querySelector('.context-label span').textContent = isAthlete ? t('Sport / disciplína', 'Sport / discipline') : t('Značka / společnost', 'Brand / company');
-  f.elements.context.placeholder = isAthlete ? t('Čemu se věnuješ?', 'What is your sport?') : t('Koho zastupuješ?', 'Who do you represent?');
+  const isMedia = e.target.value === 'media';
+  f.querySelector('.context-label span').textContent = isAthlete ? t('Sport / disciplína', 'Sport / discipline') : isMedia ? t('Médium / redakce', 'Outlet / newsroom') : t('Značka / společnost', 'Brand / company');
+  f.elements.context.placeholder = isAthlete ? t('Čemu se věnuješ?', 'What is your sport?') : isMedia ? t('Pro koho píšeš?', 'Who do you write for?') : t('Koho zastupuješ?', 'Who do you represent?');
 });
 
 document.addEventListener('submit', e => {
@@ -501,7 +724,7 @@ function initMotion() {
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('revealed'); observer.unobserve(entry.target); }
     }), { threshold: .1 });
-    document.querySelectorAll('.section-head,.service,.manifesto>div,.athlete,.achievement-grid li,.timeline li,.contact-shell>div').forEach((el, i) => {
+    document.querySelectorAll('.section-head,.service,.manifesto>div,.athlete,.achievement-grid li,.timeline li,.contact-shell>div,.logo-tier,.news-grid li,.project-row,.faq details,.film-copy').forEach((el, i) => {
       el.classList.add('reveal');
       el.style.setProperty('--reveal-delay', (i % 3) * 70 + 'ms');
       observer.observe(el);

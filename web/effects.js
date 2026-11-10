@@ -54,7 +54,8 @@ function initDust(stage) {
   function attach() {
     const slide = stage.querySelector('.depth-slide.is-current');
     if (!slide) return;
-    const figure = slide.querySelector('.scene-figure');
+    // bez výřezu postavy (např. projekt) jde prach za slovo
+    const figure = slide.querySelector('.scene-figure') || slide.querySelector('.scene-grit');
     slide.insertBefore(back, figure);
     figure.after(front);
   }

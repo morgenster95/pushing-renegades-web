@@ -2587,3 +2587,585 @@ footer {
     font-size: 17px;
   }
 }
+
+/* =====================================================================
+   Rozšíření 11/2026: projekty, partneři, úvodní spot, aktuality, média.
+   Používá stávající prvky (karty, scéna, časová osa, žlutý blok) –
+   tady jsou jen nové drobnosti.
+   ===================================================================== */
+
+/* ---------- Štítek MOCKUP (vypíná brand.showDrafts v content.js) ---------- */
+.draft-tag {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 6px 2px;
+  border: 1px dashed currentColor;
+  font: 500 9px/1 'IBM Plex Mono',monospace;
+  letter-spacing: .1em;
+  color: #ff8a3d;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+
+/* ---------- Logo agentury (až bude) ---------- */
+.wordmark.has-logo {
+  display: block;
+}
+.brand-logo {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+}
+
+/* ---------- Mise / vize / filozofie pod postojem ---------- */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 46px 0 0;
+  border-top: 1px solid var(--line);
+}
+.pillars div {
+  padding: 20px 20px 0 0;
+}
+.pillars div + div {
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+.pillars dt {
+  font: 800 26px/1 var(--heading);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.pillars dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+/* ---------- Video pás: úvodní spot / video projektu ---------- */
+.film-band {
+  padding: 0 4%;
+}
+.film-frame {
+  position: relative;
+  height: clamp(460px, 48vw, 720px);
+  overflow: hidden;
+  background: #0d0e0d;
+}
+.film-frame > img {
+  position: absolute;
+  inset: 0;
+  filter: saturate(.7) contrast(1.05);
+}
+.film-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #0d0e0dee 0%, #0d0e0d99 45%, #0d0e0d22 100%), linear-gradient(0deg, #0d0e0dcc, transparent 50%);
+}
+.film-copy {
+  position: absolute;
+  left: 5%;
+  bottom: 9%;
+  max-width: 640px;
+}
+.film-copy .eyebrow {
+  color: var(--accent);
+}
+.film-copy p {
+  margin: 0 0 6px;
+  font: 500 clamp(16px, 1.5vw, 21px)/1.4 var(--sans);
+  color: #e6e6dc;
+}
+.film-copy h2 {
+  margin: 26px 0 0;
+  font-size: clamp(54px, 7vw, 110px);
+  color: #fff;
+}
+.film-copy h2 em,
+.project-word em {
+  font-style: normal;
+  color: var(--accent);
+}
+.film-play {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(110px, 12vw, 170px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: #0d0e0d66;
+  backdrop-filter: blur(6px);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  transition: background .3s, color .3s;
+}
+.film-play span {
+  font-size: clamp(34px, 3.4vw, 48px);
+  line-height: 1;
+}
+.film-play small {
+  font-size: 9px;
+  max-width: 80%;
+  text-align: center;
+}
+.film-play:hover {
+  background: var(--accent);
+  color: #141714;
+}
+.video-frame.is-vertical {
+  aspect-ratio: 9 / 16;
+  max-height: 80vh;
+  margin: auto;
+}
+
+/* ---------- Projekty: velké karty + řádky ---------- */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 20px;
+}
+.project-card .picture {
+  height: clamp(380px, 36vw, 520px);
+}
+.project-card .picture img {
+  filter: saturate(.6) brightness(.75);
+}
+.project-word {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  font: 900 clamp(80px, 11vw, 190px)/.8 var(--heading);
+  letter-spacing: -.04em;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: none;
+}
+.project-card h3 {
+  text-transform: uppercase;
+}
+.project-tagline {
+  margin: 12px 0 0;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.project-rows {
+  margin-top: 46px;
+  border-top: 1px solid var(--line);
+}
+.project-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 1.2fr) minmax(0, 2fr) 40px;
+  gap: 26px;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+  transition: background .3s;
+}
+.project-row small {
+  color: var(--accent);
+}
+.project-row h3 {
+  margin: 0;
+  font: 800 clamp(30px, 3vw, 44px)/1 var(--heading);
+  text-transform: uppercase;
+}
+.project-row p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.project-row .arrow {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #151515;
+}
+.project-row:hover {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+/* scéna projektu bez výřezu postavy: text může být širší */
+.profile-stage.no-figure .profile-scene-copy {
+  max-width: 60%;
+}
+.profile-stage.no-figure .scene-word {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--accent);
+}
+.team .timeline-label a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Loga partnerů ----------
+   Každé logo má stejný rámeček; výšku loga řídí --logo-h podle úrovně a --k (dorovnání
+   poměru stran, počítá app.js). Loga jsou jednobarevná bílá, výjimka: color: true. */
+.partners-section {
+  border-top: 1px solid var(--line);
+}
+.logo-tier + .logo-tier {
+  margin-top: 40px;
+}
+.logo-tier .eyebrow {
+  margin-bottom: 14px;
+}
+.logo-wall {
+  --logo-h: 44px;
+  --slot-h: 120px;
+  --min-w: 220px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--min-w, 220px)), 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.logo-wall.logo-general {
+  --logo-h: 76px;
+  --slot-h: 200px;
+  --min-w: 100%;
+}
+.logo-wall.logo-media {
+  --logo-h: 32px;
+  --slot-h: 96px;
+  --min-w: 170px;
+}
+.logo-wall li {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+/* ≤ 4 loga (5 u mediálních) vyplní celou šířku řádku */
+.logo-wall:not(.logo-media):has(> li:nth-child(-n+4):last-child),
+.logo-wall.logo-media:has(> li:nth-child(-n+5):last-child) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min-w, 220px)), 1fr));
+}
+.footer-brand .wordmark {
+  color: var(--ink);
+}
+.project-page .film-band {
+  padding-bottom: 94px;
+}
+.logo-slot {
+  height: var(--slot-h);
+  padding: 18px 12%;
+  display: grid;
+  place-items: center;
+  transition: background .3s;
+}
+a.logo-slot:hover {
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg));
+}
+.logo-img {
+  width: auto;
+  height: calc(var(--logo-h) * var(--k, 1));
+  max-width: 100%;
+  max-height: calc(var(--slot-h) - 36px);
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: .82;
+  transition: opacity .3s;
+}
+.logo-img.logo-color {
+  filter: none;
+  opacity: 1;
+}
+a.logo-slot:hover .logo-img {
+  opacity: 1;
+}
+.logo-placeholder {
+  width: 100%;
+  height: calc(var(--logo-h) * 1.25);
+  max-width: 260px;
+  border: 1px dashed #ffffff38;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  color: #ffffff59;
+}
+.logo-placeholder b {
+  font: 800 calc(var(--logo-h) * .38)/1 var(--heading);
+  letter-spacing: .08em;
+}
+.logo-placeholder small {
+  font-size: 9px;
+}
+.logo-general .logo-placeholder {
+  max-width: 420px;
+}
+
+/* ---------- Aktuality ---------- */
+.news-section {
+  border-top: 1px solid var(--line);
+}
+.news-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.news-grid li {
+  background: var(--bg);
+}
+.news-grid li > * {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 220px;
+  padding: 24px 22px;
+  position: relative;
+  transition: background .3s;
+}
+.news-grid small {
+  color: var(--accent);
+  margin-bottom: auto;
+  padding-bottom: 30px;
+}
+.news-grid h3 {
+  font: 700 24px/1.05 var(--heading);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  padding-right: 40px;
+}
+.news-grid p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.news-grid .arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: var(--accent);
+}
+.news-grid a:hover {
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg));
+}
+
+/* ---------- Média ---------- */
+.media-page {
+  padding-bottom: 30px;
+}
+.media-email {
+  display: inline-block;
+  margin-top: 10px;
+  font: 800 clamp(26px, 3vw, 44px)/1 var(--heading);
+  border-bottom: 3px solid currentColor;
+  word-break: break-all;
+}
+.inline-link {
+  color: var(--accent);
+  white-space: nowrap;
+}
+.faq-section {
+  border-top: 1px solid var(--line);
+}
+.faq {
+  border-top: 1px solid var(--line);
+}
+.faq details {
+  border-bottom: 1px solid var(--line);
+}
+.faq summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 0;
+  font: 700 clamp(22px, 2.2vw, 30px)/1.1 var(--heading);
+  text-transform: uppercase;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary > span:last-child {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 34px;
+  transition: transform .3s;
+}
+.faq details[open] summary > span:last-child {
+  transform: rotate(45deg);
+}
+.faq summary:hover {
+  color: var(--accent);
+}
+.faq details p {
+  margin: 0 0 26px;
+  max-width: 720px;
+  color: var(--muted);
+}
+
+/* ---------- Patička ---------- */
+footer.site-footer {
+  display: block;
+  padding: 0;
+}
+.footer-main {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 6%;
+  padding: 60px 4% 50px;
+}
+.footer-brand p {
+  margin: 22px 0 0;
+  max-width: 340px;
+  font-size: 13px;
+}
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font: 700 22px/1 var(--heading);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.footer-links a:hover,
+.footer-email:hover {
+  color: var(--accent);
+}
+.footer-contact .eyebrow {
+  margin-bottom: 14px;
+}
+.footer-email {
+  display: block;
+  font: 700 22px/1.1 var(--heading);
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 25px 4%;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .pillars {
+    grid-template-columns: 1fr;
+  }
+  .pillars div + div {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .pillars div {
+    padding-bottom: 18px;
+  }
+  .project-row {
+    grid-template-columns: 1fr 40px;
+    gap: 8px 16px;
+  }
+  .project-row small,
+  .project-row p {
+    grid-column: 1;
+  }
+  .project-row .arrow {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+  .profile-stage.no-figure .profile-scene-copy {
+    max-width: 80%;
+  }
+}
+@media (max-width: 600px) {
+  .film-band {
+    padding: 0;
+  }
+  .film-frame {
+    height: 600px;
+  }
+  .film-shade {
+    background: linear-gradient(0deg, #0d0e0df2 0%, #0d0e0daa 55%, #0d0e0d33 100%);
+  }
+  .film-copy {
+    left: 6%;
+    right: 6%;
+    bottom: 32px;
+  }
+  .film-copy p {
+    font-size: 15px;
+  }
+  .film-play {
+    top: 26%;
+    right: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+  .project-card .picture {
+    height: 420px;
+  }
+  .project-word {
+    font-size: 30vw;
+  }
+  .logo-wall,
+  .logo-wall.logo-media {
+    --min-w: 150px;
+    --slot-h: 96px;
+  }
+  .logo-wall {
+    --logo-h: 36px;
+  }
+  .logo-wall.logo-general {
+    --min-w: 100%;
+    --slot-h: 150px;
+    --logo-h: 56px;
+  }
+  .logo-wall.logo-media {
+    --logo-h: 28px;
+  }
+  .news-grid li > * {
+    min-height: 0;
+  }
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 46px 5% 40px;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px 5%;
+  }
+  .profile-stage.no-figure .profile-scene-copy {
+    max-width: none;
+  }
+}
+.project-card small {
+  max-width: 140px;
+  text-align: right;
+}
+@media (max-width: 600px) {
+  .film-copy p br {
+    display: none;
+  }
+}

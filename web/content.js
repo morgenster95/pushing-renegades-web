@@ -33,7 +33,13 @@ window.CONTENT = {
      impact     … volitelná sekce navíc (např. charita), stejná struktura jako goals
      partnerOffer … sekce Pro partnery: { text: { cs, en }, items: { cs: [...], en: [...] }, reach: [{ value, label: { cs, en } }] }
      socials    … odkazy: [{ label: 'Instagram', url: 'https://...' }]
-     partners   … loga partnerů: [{ name, logo: 'assets/partneri/x.webp', url }] – prázdné = sekce se nezobrazí
+     partners   … partneři a sponzoři sportovce (každý má vlastní): [{ name, logo, url, tier, color }]
+                  tier: 'main' (hlavní partner, větší logo) / 'partner' (výchozí) / 'media'
+                  logo: cesta k souboru (SVG ideálně, viz README → Loga partnerů). Bez loga = šedý mockup rámeček.
+                  color: true = logo se zobrazí v původních barvách (jinak jednobarevně, aby ladilo s webem)
+                  prázdné = sekce Partneři se nezobrazí
+     values     … volitelně „Mise a hodnoty“, stejná struktura jako goals
+     news       … volitelně aktuality sportovce: [{ date, title: { cs, en }, text: { cs, en }, url }]
      gallery    … fotky: [{ src, alt: { cs, en } }]
      video      … odkaz na YouTube / Vimeo (embed), např. 'https://www.youtube.com/embed/XXXX'
   */
@@ -102,7 +108,12 @@ window.CONTENT = {
         { label: 'Instagram', url: 'https://www.instagram.com/jane_svecova/' },
         { label: 'YouTube', url: 'https://www.youtube.com/@janesvecova' }
       ],
-      partners: [],
+      partners: [
+        { name: 'Hlavní partner', tier: 'main', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true }
+      ],
       gallery: [
         { src: 'assets/athletes/jana-svecova/gallery-1.webp', alt: { cs: 'Jana Švecová v boulderu', en: 'Jana Švecová on a boulder' } },
         { src: 'assets/athletes/jana-svecova/gallery-2.webp', alt: { cs: 'Jana Švecová při lezení', en: 'Jana Švecová climbing' } },
@@ -173,7 +184,12 @@ window.CONTENT = {
       socials: [
         { label: 'Instagram', url: 'https://www.instagram.com/patrik.vebr/' }
       ],
-      partners: [],
+      partners: [
+        { name: 'Hlavní partner', tier: 'main', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true }
+      ],
       gallery: [
         { src: 'assets/athletes/patrik-vebr/gallery-1.webp', alt: { cs: 'Patrik Vebr na Pražském půlmaratonu', en: 'Patrik Vebr at the Prague Half Marathon' } },
         { src: 'assets/athletes/patrik-vebr/gallery-2.webp', alt: { cs: 'Patrik Vebr s fanoušky', en: 'Patrik Vebr with fans' } },
@@ -254,7 +270,12 @@ window.CONTENT = {
       socials: [
         { label: 'Instagram', url: 'https://www.instagram.com/stveraktomas/' }
       ],
-      partners: [],
+      partners: [
+        { name: 'Hlavní partner', tier: 'main', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true },
+        { name: 'Partner', draft: true }
+      ],
       gallery: [
         { src: 'assets/athletes/tomas-stverak/gallery-1.webp', alt: { cs: 'Tomáš Štverák s čelovkou za soumraku', en: 'Tomáš Štverák with a headlamp at dusk' } },
         { src: 'assets/athletes/tomas-stverak/gallery-2.webp', alt: { cs: 'Výstup po skalách', en: 'Climbing over rocks' } },
@@ -278,6 +299,269 @@ window.CONTENT = {
 
   /* Sportovci zobrazení na hlavní stránce v sekci „The Renegades“ (slugy, v tomto pořadí). */
   homeAthletes: ['jana-svecova', 'patrik-vebr', 'tomas-stverak'],
+
+  /* ---------- ZNAČKA ----------
+     logo        … soubor loga agentury (SVG). null = zobrazí se textový nápis PUSHING RENEGADES.
+     showDrafts  … true = mockupové texty a loga mají štítek MOCKUP. Před spuštěním přepnout na false
+                   (a mockupy nahradit nebo smazat). Mockup se v datech značí draft: true.
+     email       … obecný kontakt agentury (patička). Osobní kontakty sportovců a manažerů na web nedáváme.
+     socials     … sítě agentury: [{ label, url }]
+  */
+  brand: {
+    logo: null,
+    showDrafts: true,
+    email: 'info@pushingrenegades.cz',
+    socials: [
+      { label: 'Instagram', url: '#', draft: true },
+      { label: 'Facebook', url: '#', draft: true },
+      { label: 'YouTube', url: '#', draft: true },
+      { label: 'LinkedIn', url: '#', draft: true }
+    ]
+  },
+
+  /* ---------- ÚVODNÍ PR SPOT (hlavní stránka) ----------
+     video          … embed odkaz na verzi na šířku (YouTube / Vimeo), např. 'https://www.youtube-nocookie.com/embed/XXXX'
+     videoVertical  … embed odkaz na verzi na výšku (zobrazí se na mobilu); když chybí, použije se video
+     poster         … obrázek pod tlačítkem přehrát
+     lines          … text přes obraz (voiceover spotu)
+     Dokud video chybí, tlačítko ukáže „Premiéra“.
+  */
+  film: {
+    video: null,
+    videoVertical: null,
+    poster: 'assets/mountain.webp',
+    eyebrow: { cs: 'Úvodní spot', en: 'Launch film' },
+    premiere: { cs: 'Premiéra v lednu 2027', en: 'Premiere in January 2027' },
+    lines: [
+      'In our mad world obsessed with numbers, limits and records,',
+      'we believe that hard work, dedication and story still matter.',
+      'We support true underdogs unafraid to show courage,<br>beating heart and unbreakable determination.'
+    ],
+    claim: 'WE PUSH <em>RENEGADES!</em>'
+  },
+
+  /* ---------- PROJEKTY ----------
+     Každý projekt má vlastní podstránku (?project=slug) postavenou stejně jako profil sportovce.
+     slug, title, kicker (typ projektu), tagline, accent (barva, výchozí žlutá)
+     featured  … true = velká karta mezi hlavními projekty na úvodní stránce
+     athletes  … slugy sportovců, kteří v projektu jsou (projekt se ukáže i na jejich profilu)
+     hero      … { word, background, cutout } jako u sportovce (cutout je volitelný)
+     stats, story, timeline (stejně jako goals), team: [{ name, role: { cs, en }, detail: { cs, en }, athlete: slug }]
+     offer     … sekce Pro partnery (stejně jako partnerOffer u sportovce)
+     partners  … partneři projektu ve skupinách: [{ tier: 'general' | 'partner' | 'media', title: { cs, en }, items: [{ name, logo, url, color }] }]
+     video     … { video, videoVertical, poster, lines, claim } – stejně jako úvodní spot
+     inquiry   … předvyplněný text do formuláře
+     draft     … true = mockup (štítek MOCKUP)
+  */
+  projects: [
+    {
+      slug: 'k2',
+      featured: true,
+      draft: true,
+      title: 'K2',
+      kicker: { cs: 'Expedice', en: 'Expedition' },
+      tagline: { cs: 'Jakub Váňa a Tomáš Petreček míří na druhou nejvyšší horu světa. Hora, které se říká hora hor.', en: 'Jakub Váňa and Tomáš Petreček are heading for the second highest mountain on Earth. The one they call the mountain of mountains.' },
+      hero: { word: 'K2', background: 'assets/mountain.webp' },
+      illustrative: true,
+      stats: [
+        { value: '8 611 m', label: { cs: 'nadmořská výška', en: 'elevation' } },
+        { value: 'KARAKORAM', label: { cs: 'Pákistán / Čína', en: 'Pakistan / China' } },
+        { value: '2', label: { cs: 'renegádi v jádru týmu', en: 'renegades at the core' } }
+      ],
+      story: {
+        title: { cs: 'Ne každý vrchol je o tom, kdo tam stál první.', en: 'Not every summit is about who stood there first.' },
+        paragraphs: {
+          cs: [
+            'K2 není hora, na kterou se jde pro fotku z vrcholu. Je to zkouška trpělivosti, týmu a rozhodnutí, která se dělají v řídkém vzduchu a na hraně možností.',
+            'Projekt K2 je pro Pushing Renegades víc než expedice. Je to příběh dvou lidí, kteří si svou cestu vydřeli, a týmu, který jim pomáhá ji ukázat. Od přípravy přes aklimatizaci až po návrat domů.',
+            'Celou cestu zachytíme na video a otevřeme ji partnerům, kteří chtějí být součástí něčeho skutečného.'
+          ],
+          en: [
+            'K2 is not a mountain you climb for a summit selfie. It tests patience, the team and decisions made in thin air, right at the edge of what is possible.',
+            'For Pushing Renegades, K2 is more than an expedition. It is the story of two people who earned their own path, and of a team that helps them show it. From preparation and acclimatisation all the way back home.',
+            'We will capture the whole journey on film and open it to partners who want to be part of something real.'
+          ]
+        },
+        quote: { cs: 'Hora rozhodne. My jen musíme být připravení.', en: 'The mountain decides. We just have to be ready.' }
+      },
+      timeline: {
+        title: { cs: 'Cesta<br>na K2.', en: 'The road<br>to K2.' },
+        intro: { cs: 'Termíny a detaily expedice doplníme podle prezentace projektu.', en: 'Dates and expedition details will follow from the project presentation.' },
+        items: [
+          { label: { cs: 'FÁZE 01', en: 'PHASE 01' }, title: { cs: 'Příprava', en: 'Preparation' }, detail: { cs: 'Trénink, výběr týmu, logistika, vybavení a partneři.', en: 'Training, team selection, logistics, equipment and partners.' } },
+          { label: { cs: 'FÁZE 02', en: 'PHASE 02' }, title: { cs: 'Aklimatizace', en: 'Acclimatisation' }, detail: { cs: 'Cesta do základního tábora a postupné zvykání na výšku.', en: 'The trek to base camp and gradual adaptation to altitude.' } },
+          { label: { cs: 'FÁZE 03', en: 'PHASE 03' }, title: { cs: 'Výstup', en: 'The climb' }, detail: { cs: 'Okno na vrchol. Rozhodnutí, která se nedají vrátit.', en: 'The summit window. Decisions that cannot be undone.' } },
+          { label: { cs: 'FÁZE 04', en: 'PHASE 04' }, title: { cs: 'Příběh', en: 'The story' }, detail: { cs: 'Film, přednášky a obsah pro partnery i fanoušky.', en: 'Film, talks and content for partners and fans.' } }
+        ]
+      },
+      team: [
+        { name: 'Jakub Váňa', role: { cs: 'Horolezec', en: 'Mountaineer' }, detail: { cs: 'Profil doplníme.', en: 'Profile coming soon.' } },
+        { name: 'Tomáš Petreček', role: { cs: 'Horolezec', en: 'Mountaineer' }, detail: { cs: 'Profil doplníme.', en: 'Profile coming soon.' } }
+      ],
+      offer: {
+        text: { cs: 'Expedice na K2 je příběh, který lidé sledují od prvního tréninku až po návrat domů. Partnerům nabízíme místo přímo v něm, ne jen na reklamní ploše.', en: 'A K2 expedition is a story people follow from the first training session all the way home. We offer partners a place inside it, not just ad space.' },
+        items: {
+          cs: ['Značka ve filmu a v obsahu z expedice', 'Testování vybavení v extrémních podmínkách', 'Přednášky a firemní akce po návratu', 'Exkluzivní obsah pro sítě partnera'],
+          en: ['Brand presence in the film and expedition content', 'Gear testing in extreme conditions', 'Talks and corporate events after the return', 'Exclusive content for the partner’s channels']
+        }
+      },
+      partners: [
+        { tier: 'general', title: { cs: 'Generální partner expedice', en: 'Expedition title partner' }, items: [{ name: 'Generální partner', draft: true }] },
+        { tier: 'partner', title: { cs: 'Partneři', en: 'Partners' }, items: [{ name: 'Outdoor', draft: true }, { name: 'Technologie', draft: true }, { name: 'Výživa', draft: true }] }
+      ],
+      video: { poster: 'assets/mountain.webp', lines: ['The mountain decides.'], claim: 'K2 / <em>SOON</em>' },
+      inquiry: { cs: 'Mám zájem o partnerství projektu K2.', en: 'I am interested in partnering on the K2 project.' }
+    },
+    {
+      slug: 'rekord',
+      featured: true,
+      draft: true,
+      title: 'REKORD',
+      kicker: { cs: 'Dokumentární film', en: 'Documentary' },
+      athletes: ['patrik-vebr'],
+      accent: '#ffd400',
+      tagline: { cs: 'Patrik Vebr jde po českém maratonském rekordu, který drží od roku 1993 Karel David. Film o tom, jak se mění historie. Pracovní název.', en: 'Patrik Vebr is chasing the Czech marathon record held by Karel David since 1993. A film about how history changes. Working title.' },
+      hero: { word: '2:11:57', background: 'assets/athletes/patrik-vebr/hero.webp', cutout: 'assets/athletes/patrik-vebr/cutout.webp' },
+      stats: [
+        { value: '2:11:57', label: { cs: 'český rekord · 1993', en: 'Czech record · 1993' } },
+        { value: '2:16:27', label: { cs: 'Patrikův maraton · 2026', en: 'Patrik’s marathon · 2026' } },
+        { value: '7. 12.', label: { cs: 'první pokus · Valencia', en: 'first attempt · Valencia' } }
+      ],
+      story: {
+        title: { cs: 'Natáčíme, i když nikdo neví, jak to dopadne.', en: 'We are filming, even though nobody knows how it ends.' },
+        paragraphs: {
+          cs: [
+            'Rekord 2:11:57 vydržel přes třicet let. Patrik Vebr mu podřídil poslední dva roky: tisíce kilometrů, soustředění v Keni a závody doma i v zahraničí.',
+            'Dokumentární film v režii Jana Šimánka zachycuje cestu za rekordem zevnitř. Tréninky, spolupráci s trenérem, osobní život i samotné rekordní pokusy. A příběh nové generace českých vytrvalců.'
+          ],
+          en: [
+            'The 2:11:57 record has stood for over thirty years. Patrik Vebr has dedicated the last two years to it: thousands of kilometres, training camps in Kenya and races at home and abroad.',
+            'The documentary directed by Jan Šimánek follows the road to the record from the inside. Training, work with the coach, personal life and the record attempts themselves. And the story of a new generation of Czech distance runners.'
+          ]
+        }
+      },
+      timeline: {
+        title: { cs: 'Jak se mění<br>historie.', en: 'How history<br>changes.' },
+        items: [
+          { label: '2024–26', title: { cs: 'Příprava', en: 'Preparation' }, detail: { cs: 'Soustředění v Keni, závody a postupné zlepšování až na 2:16:27 v Barceloně.', en: 'Camps in Kenya, races and steady progress down to 2:16:27 in Barcelona.' } },
+          { label: '7. 12. 2026', title: { cs: 'Valencia', en: 'Valencia' }, detail: { cs: 'První pokus o český rekord.', en: 'First attempt at the Czech record.' } },
+          { label: 'FILM', title: { cs: 'Premiéra', en: 'Premiere' }, detail: { cs: 'Termín premiéry oznámíme.', en: 'Premiere date to be announced.' } }
+        ]
+      },
+      team: [
+        { name: 'Patrik Vebr', athlete: 'patrik-vebr', role: { cs: 'Maratonec', en: 'Marathon runner' }, detail: { cs: 'Hlavní postava filmu.', en: 'The film’s protagonist.' } },
+        { name: 'Jan Šimánek', role: { cs: 'Režie', en: 'Director' }, detail: { cs: 'Režisér dokumentu.', en: 'Director of the documentary.' } }
+      ],
+      offer: {
+        text: { cs: 'Film o rekordu je příležitost spojit značku s příběhem, který se teprve píše. Partneři projektu jsou ve filmu i v obsahu kolem něj.', en: 'A film about the record is a chance to tie a brand to a story that is still being written. Project partners appear in the film and in the content around it.' },
+        items: {
+          cs: ['Zapojení značky do dokumentárního filmu', 'Obsah ze zákulisí přípravy a závodů', 'Premiéra, projekce a přednášky'],
+          en: ['Brand involvement in the documentary', 'Behind-the-scenes content from training and races', 'Premiere, screenings and talks']
+        }
+      },
+      partners: [
+        { tier: 'partner', title: { cs: 'Partneři filmu', en: 'Film partners' }, items: [{ name: 'Partner filmu', draft: true }, { name: 'Partner filmu', draft: true }] }
+      ],
+      video: { poster: 'assets/athletes/patrik-vebr/gallery-4.webp', lines: ['Teaser'], claim: 'REKORD / <em>TEASER</em>' },
+      inquiry: { cs: 'Mám zájem o partnerství filmu REKORD.', en: 'I am interested in partnering on the REKORD film.' }
+    },
+    {
+      slug: 'tracking',
+      draft: true,
+      title: 'TRACKING',
+      kicker: { cs: 'Služba', en: 'Service' },
+      tagline: { cs: 'Živé sledování závodníků na trati. Pro fanoušky, partnery i média. Ve spolupráci s Pavlem Paloncým.', en: 'Live tracking of athletes on course. For fans, partners and media. In cooperation with Pavel Paloncý.' },
+      hero: { word: 'LIVE', background: 'assets/athletes/tomas-stverak/gallery-1.webp' },
+      illustrative: true,
+      stats: [
+        { value: 'LIVE', label: { cs: 'poloha v reálném čase', en: 'real-time position' } },
+        { value: '24/7', label: { cs: 'ultra, expedice, FKT', en: 'ultra, expeditions, FKT' } },
+        { value: '1 odkaz', label: { cs: 'pro fanoušky i partnery', en: 'for fans and partners' } }
+      ],
+      story: {
+        title: { cs: 'Ať lidé vidí, kde se příběh právě odehrává.', en: 'Let people see where the story is happening right now.' },
+        paragraphs: {
+          cs: [
+            'Ultra závod, expedice nebo pokus o FKT trvá hodiny i dny. Tracking dává fanouškům, rodině, partnerům a médiím možnost sledovat závodníka živě na mapě.',
+            'Postaráme se o tracker, mapu i komunikaci. Ty se soustředíš na výkon.'
+          ],
+          en: [
+            'An ultra race, an expedition or an FKT attempt lasts hours or days. Tracking lets fans, family, partners and media follow the athlete live on a map.',
+            'We take care of the tracker, the map and the communication. You focus on the performance.'
+          ]
+        }
+      },
+      timeline: {
+        title: { cs: 'Jak to<br>funguje.', en: 'How it<br>works.' },
+        items: [
+          { label: '01', title: { cs: 'Tracker', en: 'Tracker' }, detail: { cs: 'Závodník dostane GPS tracker a my nastavíme trasu.', en: 'The athlete gets a GPS tracker and we set up the route.' } },
+          { label: '02', title: { cs: 'Živá mapa', en: 'Live map' }, detail: { cs: 'Fanoušci sledují polohu, tempo a průběh na jednom odkazu.', en: 'Fans follow position, pace and progress on a single link.' } },
+          { label: '03', title: { cs: 'Příběh a data', en: 'Story and data' }, detail: { cs: 'Z trasy vznikne obsah pro sítě, partnery a média.', en: 'The route becomes content for social media, partners and the press.' } }
+        ]
+      },
+      team: [
+        { name: 'Pavel Paloncý', role: { cs: 'Tracking', en: 'Tracking' }, detail: { cs: 'Profil doplníme.', en: 'Profile coming soon.' } }
+      ],
+      inquiry: { cs: 'Mám zájem o tracking na závodě: ', en: 'I am interested in tracking for a race: ' }
+    }
+  ],
+
+  /* ---------- PARTNEŘI PUSHING RENEGADES (hlavní stránka) ----------
+     Skupiny podle úrovně. Pořadí = pořadí na webu. Prázdná skupina se nezobrazí.
+     items: [{ name, logo, url, color }] – logo podle pravidel v README (Loga partnerů).
+  */
+  partners: {
+    title: { cs: 'Partneři,<br>kteří tlačí s námi.', en: 'Partners who<br>push with us.' },
+    text: { cs: 'Spolupracujeme se značkami, které sdílejí naše hodnoty. Partneři jednotlivých sportovců jsou na jejich profilech.', en: 'We work with brands that share our values. Each athlete’s own partners are listed on their profile.' },
+    tiers: [
+      { tier: 'general', title: { cs: 'Generální partner', en: 'Title partner' }, items: [{ name: 'Generální partner', draft: true }] },
+      { tier: 'partner', title: { cs: 'Partneři', en: 'Partners' }, items: [{ name: 'Technologie', draft: true }, { name: 'Outdoor', draft: true }, { name: 'Finance', draft: true }, { name: 'E-commerce', draft: true }] },
+      { tier: 'media', title: { cs: 'Mediální partneři', en: 'Media partners' }, items: [{ name: 'Médium', draft: true }, { name: 'Médium', draft: true }, { name: 'Médium', draft: true }] }
+    ]
+  },
+
+  /* ---------- AKTUALITY (hlavní stránka) ----------
+     [{ date, title: { cs, en }, text: { cs, en }, url (volitelně, i odkaz na profil: '?athlete=slug') }] – nejnovější nahoře, zobrazí se 4.
+  */
+  news: [
+    { date: '12/2026', draft: true, title: { cs: 'Patrik Vebr jde ve Valencii po rekordu', en: 'Patrik Vebr goes for the record in Valencia' }, text: { cs: '7. prosince první pokus o český maratonský rekord 2:11:57.', en: 'First attempt at the 2:11:57 Czech marathon record on 7 December.' }, url: '?project=rekord' },
+    { date: '12/2026', draft: true, title: { cs: 'Natáčíme úvodní spot', en: 'Shooting the launch film' }, text: { cs: 'Renegádi před kamerou. Premiéra v lednu 2027.', en: 'The renegades in front of the camera. Premiere in January 2027.' } },
+    { date: '2026', draft: true, title: { cs: 'Jana Švecová: prvopřelez Tokyo Drift 8C', en: 'Jana Švecová: first ascent of Tokyo Drift 8C' }, text: { cs: 'Už třetí skalní 8C v Janině kariéře.', en: 'The third 8C on rock in Jana’s career.' }, url: '?athlete=jana-svecova' }
+  ],
+
+  /* ---------- MÉDIA (?page=media) ----------
+     press   … tiskové zprávy: [{ date, title: { cs, en }, text: { cs, en }, file: 'assets/media/tz.pdf' }]
+     contact … mediální kontakt agentury (ne osobní kontakty sportovců)
+     kit     … co je v press kitu + soubor ke stažení
+     faq     … [{ q: { cs, en }, a: { cs, en } }]
+  */
+  media: {
+    title: { cs: 'PRO<br><em>MÉDIA.</em>', en: 'FOR THE<br><em>PRESS.</em>' },
+    text: { cs: 'Tiskové zprávy, fotky ke stažení a kontakt pro novináře. Rozhovor se sportovcem domluvíme rychle.', en: 'Press releases, downloadable photos and a press contact. We arrange athlete interviews quickly.' },
+    press: [
+      { date: '01/2027', draft: true, title: { cs: 'Startuje Pushing Renegades: sportovní PR pro ty, kdo jdou vlastní cestou', en: 'Pushing Renegades launches: sports PR for those who take their own path' }, text: { cs: 'Tisková zpráva ke spuštění projektu. Text doplníme.', en: 'Launch press release. Text to follow.' }, file: null }
+    ],
+    contact: {
+      draft: true,
+      name: { cs: 'Mediální kontakt', en: 'Press contact' },
+      email: 'media@pushingrenegades.cz',
+      text: { cs: 'Rozhovory, fotky, natáčení a akreditace. Ozveme se do 24 hodin.', en: 'Interviews, photos, filming and accreditation. We reply within 24 hours.' }
+    },
+    kit: {
+      items: {
+        cs: ['Logo Pushing Renegades (SVG, PNG)', 'Fotky sportovců v tiskové kvalitě', 'Medailonky sportovců', 'Úvodní spot'],
+        en: ['Pushing Renegades logo (SVG, PNG)', 'Athlete photos in print quality', 'Athlete bios', 'Launch film']
+      },
+      file: null
+    },
+    faq: [
+      { draft: true, q: { cs: 'Co je Pushing Renegades?', en: 'What is Pushing Renegades?' }, a: { cs: 'Sportovní PR agentura. Zastupujeme sportovce, kteří jdou vlastní cestou, plánujeme jejich projekty, hledáme partnery a pomáháme jejich příběhům dostat se k lidem.', en: 'A sports PR agency. We represent athletes who take their own path, plan their projects, find partners and help their stories reach people.' } },
+      { draft: true, q: { cs: 'Jak domluvit rozhovor se sportovcem?', en: 'How do I arrange an interview with an athlete?' }, a: { cs: 'Napište na mediální kontakt nebo přes formulář. Domluvíme termín i formu.', en: 'Write to the press contact or use the form. We will arrange the time and format.' } },
+      { draft: true, q: { cs: 'Můžu použít fotky z webu?', en: 'Can I use photos from the website?' }, a: { cs: 'Pro média jsou fotky v press kitu. U každé uveďte autora podle popisku.', en: 'Photos for the media are in the press kit. Please credit the photographer as listed.' } },
+      { draft: true, q: { cs: 'Jak se stát partnerem?', en: 'How do I become a partner?' }, a: { cs: 'Ozvěte se přes formulář. Připravíme nabídku na míru, ať jde o sportovce, projekt, nebo celou agenturu.', en: 'Get in touch via the form. We will prepare a tailored offer for an athlete, a project or the whole agency.' } },
+      { draft: true, q: { cs: 'Jsem sportovec. Můžu se přidat?', en: 'I am an athlete. Can I join?' }, a: { cs: 'Napiš nám o sobě přes formulář (volba „Jsem sportovec“). Každou zprávu čteme.', en: 'Tell us about yourself via the form (choose “I am an athlete”). We read every message.' } }
+    ]
+  },
 
   /* ---------- TEXTY HLAVNÍ STRÁNKY ---------- */
   home: {
@@ -306,6 +590,18 @@ window.CONTENT = {
           'We are Pushing Renegades. A sports PR agency for people who take their own path. We help their achievements earn attention and build partnerships that matter to athletes and brands.'
         ]
       }
+    },
+
+    // Mise, vize, filozofie – krátce pod postojem. Smazat = nezobrazí se.
+    pillars: [
+      { draft: true, label: { cs: 'Mise', en: 'Mission' }, text: { cs: 'Podporovat výjimečné sportovce, jejich příběhy, odhodlání a cestu za vlastními cíli.', en: 'To support exceptional athletes, their stories, their determination and the road to their own goals.' } },
+      { draft: true, label: { cs: 'Vize', en: 'Vision' }, text: { cs: 'Svět, kde se vedle čísel a rekordů počítá i dřina, odvaha a příběh.', en: 'A world where hard work, courage and story count alongside numbers and records.' } },
+      { draft: true, label: { cs: 'Filozofie', en: 'Philosophy' }, text: { cs: 'Neděláme z lidí reklamu. Dáváme hlas tomu, co už v nich je.', en: 'We don’t turn people into ads. We give a voice to what is already there.' } }
+    ],
+
+    projects: {
+      title: { cs: 'Projekty,<br>které posouvají hranice.', en: 'Projects that<br>push limits.' },
+      text: { cs: 'Expedice, filmy a služby, které stavíme se sportovci a partnery.', en: 'Expeditions, films and services we build with athletes and partners.' }
     },
 
     renegades: {
@@ -370,6 +666,7 @@ window.CONTENT = {
 
   /* ---------- PATIČKA ---------- */
   footer: {
+    claim: { cs: 'Sportovní PR agentura pro sportovce, kteří jdou vlastní cestou. Zastupujeme je, plánujeme projekty a propojujeme je se značkami.', en: 'A sports PR agency for athletes who take their own path. We represent them, plan projects and connect them with brands.' },
     left: 'PUSHING RENEGADES / WE PUSH RENEGADES.',
     right: { cs: 'SPORTOVNÍ PR VLASTNÍ CESTOU', en: 'SPORTS PR OUR OWN WAY' }
   }
